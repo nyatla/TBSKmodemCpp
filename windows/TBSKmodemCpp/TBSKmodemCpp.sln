@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libTbskModem", "libTbskModem\libTbskModem.vcxproj", "{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleApplication1", "CompileTest\ConsoleApplication1\ConsoleApplication1.vcxproj", "{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632} = {1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PcmTest", "PcmTest\PcmTest.vcxproj", "{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Debug|x64.ActiveCfg = Debug|x64
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Debug|x64.Build.0 = Debug|x64
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Debug|x86.ActiveCfg = Debug|Win32
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Debug|x86.Build.0 = Debug|Win32
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Release|x64.ActiveCfg = Release|x64
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Release|x64.Build.0 = Release|x64
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Release|x86.ActiveCfg = Release|Win32
+		{1357BFEA-EC4D-4DD5-BBCB-453BE18E2632}.Release|x86.Build.0 = Release|Win32
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Debug|x64.ActiveCfg = Debug|x64
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Debug|x64.Build.0 = Debug|x64
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Debug|x86.ActiveCfg = Debug|Win32
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Debug|x86.Build.0 = Debug|Win32
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Release|x64.ActiveCfg = Release|x64
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Release|x64.Build.0 = Release|x64
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Release|x86.ActiveCfg = Release|Win32
+		{EE4BF47C-D12D-4F1A-979C-AE080638CC3D}.Release|x86.Build.0 = Release|Win32
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Debug|x64.ActiveCfg = Debug|x64
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Debug|x64.Build.0 = Debug|x64
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Debug|x86.ActiveCfg = Debug|Win32
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Debug|x86.Build.0 = Debug|Win32
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Release|x64.ActiveCfg = Release|x64
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Release|x64.Build.0 = Release|x64
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Release|x86.ActiveCfg = Release|Win32
+		{A5F251A7-1A19-48A7-A750-08CC48C2F0BD}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {86DE0407-B6B2-4BC2-91F2-3E76AC4A6489}
+	EndGlobalSection
+EndGlobal
