@@ -2,16 +2,14 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     class ByteCastIter :public virtual IPyIterator<int>
     {
     private:
-        IPyIterator<TBSK_BYTE>* _src;
+        const shared_ptr<IPyIterator<TBSK_BYTE>> _src;
     public:
-        ByteCastIter(IPyIterator<TBSK_BYTE>& ref_src)
+        ByteCastIter(shared_ptr<IPyIterator<TBSK_BYTE>>& ref_src) :_src{ref_src}
         {
-            this->_src = &ref_src;
         }
         int Next()override
         {
@@ -21,11 +19,10 @@ namespace TBSKmodemCPP
     class CharCastIter : public virtual IPyIterator<int>
     {
     private:
-        IPyIterator<char>* _src;
+        const shared_ptr<IPyIterator<char>> _src;
     public:
-        CharCastIter(IPyIterator<char>& ref_src)
+        CharCastIter(shared_ptr<IPyIterator<char>>& ref_src) :_src{ ref_src }
         {
-            this->_src = &ref_src;
         }
         int Next()override
         {

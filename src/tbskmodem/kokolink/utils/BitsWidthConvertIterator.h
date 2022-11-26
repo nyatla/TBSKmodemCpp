@@ -2,10 +2,10 @@
 #include "./recoverable.h"
 #include "../interfaces.h"
 #include "../types/types.h"
+#include "../compatibility.h"
 #include <memory>
 namespace TBSKmodemCPP
 {
-    using namespace std;
     class StopIteration_BitsWidthConvertIterator_FractionalBitsLeft :public PyStopIteration
     {
     public:
@@ -16,7 +16,7 @@ namespace TBSKmodemCPP
 
     // """ 任意ビット幅のintストリームを任意ビット幅のint値に変換するイテレータです。
     // """
-    class BitsWidthConvertIterator :public IRecoverableIterator<int> {
+    class BitsWidthConvertIterator :public NoneCopyConstructor_class,virtual public IRecoverableIterator<int> {
     private:
         shared_ptr<IPyIterator<int>> _src;
         bool _is_eos;

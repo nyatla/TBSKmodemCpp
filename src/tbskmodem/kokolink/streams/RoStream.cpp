@@ -4,7 +4,6 @@
 #include "../utils/recoverable.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     template <typename T> RoStream<T>::RoStream(const shared_ptr<IPyIterator<T>>& src) :BasicRoStream<T>(),
         _src{src}

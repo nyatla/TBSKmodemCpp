@@ -4,12 +4,10 @@
 #include "../../utils/math/XorShiftRand31.h"
 #include <vector>
 #include <memory>
-#include <math.h>
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
-    class TraitTone :public std::vector<double> {
+    class TraitTone :public vector<double> {
     public:
         TraitTone();
         // """ 信号強度をv倍します。
@@ -19,7 +17,6 @@ namespace TBSKmodemCPP
 }
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     // """ Sin波形のトーン信号です。
     //     このトーン信号を使用したTBSKはDPSKと同じです。
@@ -32,7 +29,6 @@ namespace TBSKmodemCPP
 }
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     // """ トーン信号を巡回符号でBPSK変調した信号です。
     //     2^bits-1*len(base_tone)の長さです。

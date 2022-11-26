@@ -3,12 +3,18 @@
 #include <stdexcept>
 #include <exception>
 
+namespace TBSKmodemCPP {
+    using std::invalid_argument;
+    using std::min;
+    using std::max;
+}
+
 namespace TBSKmodemCPP
 {
 
-    static std::unique_ptr<std::vector<TBSK_BYTE>> Float2bytes(IPyIterator<double>& fdata, int bits)
+    static unique_ptr<vector<TBSK_BYTE>> Float2bytes(IPyIterator<double>& fdata, int bits)
     {
-        auto ret = std::make_unique<std::vector<TBSK_BYTE>>();
+        auto ret = make_unique<vector<TBSK_BYTE>>();
         if (bits == 8)
         {
             try {
@@ -25,27 +31,31 @@ namespace TBSKmodemCPP
         else if (bits == 16)
         {
             int r = (int)((pow(2, 16) - 1) / 2); //#Daisukeパッチ
-            for (;;) {
-                auto d = fdata.Next();
-                auto f = d * r;
-                if (f >= 0)
-                {
-                    TBSK_UINT16 v = (TBSK_UINT16)(std::min((double)INT16_MAX, f));
-                    ret->push_back((TBSK_BYTE)(v & 0xff));
-                    ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
+            try {
+                for (;;) {
+                    auto d = fdata.Next();
+                    auto f = d * r;
+                    if (f >= 0)
+                    {
+                        TBSK_UINT16 v = (TBSK_UINT16)(min((double)INT16_MAX, f));
+                        ret->push_back((TBSK_BYTE)(v & 0xff));
+                        ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
+                    }
+                    else
+                    {
+                        TBSK_UINT16 v = (TBSK_UINT16)(0xffff + (int)(max(f, (double)INT16_MIN)) + 1);
+                        ret->push_back((TBSK_BYTE)(v & 0xff));
+                        ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
+                    }
                 }
-                else
-                {
-                    TBSK_UINT16 v = (TBSK_UINT16)(0xffff + (int)(std::max(f, (double)INT16_MIN)) + 1);
-                    ret->push_back((TBSK_BYTE)(v & 0xff));
-                    ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
-                }
+            }catch (PyStopIteration) {
+                    //nothing to do
             }
             return ret;
         }
         throw std::invalid_argument("Invalid bits");
     }
-    std::unique_ptr<const PcmData> PcmData::Load(IBinaryReader& fp)
+    unique_ptr<const PcmData> PcmData::Load(IBinaryReader& fp)
     {
         return std::make_unique<const PcmData>(fp);
     }
@@ -53,30 +63,26 @@ namespace TBSKmodemCPP
 
     void PcmData::Dump(PcmData& src, IBinaryWriter& dest)
     {
-        src._wavfile.Dump(dest);
+        src._wavfile->Dump(dest);
     }
 
 
-    PcmData::PcmData(IBinaryReader& fp) :_wavfile(WaveFile(fp)) {
-
+    PcmData::PcmData(IBinaryReader& fp) :_wavfile(make_unique<WaveFile>(fp)) {
     }
 
-    PcmData::PcmData(const TBSK_BYTE* src, int size, int sample_bits, int frame_rate, std::vector<std::shared_ptr<const Chunk>>& chunks) :
-        //_sample_bits{ sample_bits },
-        //_frame_rate{ frame_rate },
-        //_frames{ std::vector<TBSK_BYTE>() },
-        _wavfile{ WaveFile(frame_rate, sample_bits, 1, src, size, chunks) }
+    PcmData::PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>& chunks) :
+        _wavfile{make_unique<WaveFile>(frame_rate, sample_bits/8, 1, src, size, chunks) }
     {
         //TBSK_ASSERT((this->_frames.size()) % (this->_sample_bits / 8) == 0);//   #srcの境界チェック
     }
-    PcmData::PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate, std::vector<std::shared_ptr<const Chunk>>& chunks) :
-        _wavfile{ WaveFile(frame_rate, sample_bits, 1,*Float2bytes(src,sample_bits), chunks) }
-        //_sample_bits{ sample_bits },
-        //_frame_rate{ _frame_rate },
-        //_frames{ std::vector<TBSK_BYTE>() },
-        //_chunks {std::move(chunks)}
+    PcmData::PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>& chunks) :
+        _wavfile{make_unique<WaveFile>(frame_rate, sample_bits / 8, 1,*Float2bytes(src,sample_bits), chunks) }
     {
-        //Float2bytes(src, sample_bits, this->_frames);
+    }
+    PcmData::PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate) :
+        _wavfile{ make_unique<WaveFile>(frame_rate, sample_bits / 8,1,  src, size) }
+    {
+
     }
 
 
@@ -85,7 +91,7 @@ namespace TBSKmodemCPP
 
     int PcmData::GetSampleBits()const
     {
-        return this->_wavfile.GetFmt()->GetSamplewidth();
+        return this->_wavfile->GetFmt()->GetSamplewidth();
     }
     // @property
     // def frame_rate(self)->int:
@@ -94,7 +100,7 @@ namespace TBSKmodemCPP
     //     return self._frame_rate
     int PcmData::GetFramerate()const
     {
-        return this->_wavfile.GetFmt()->GetFramerate();
+        return this->_wavfile->GetFmt()->GetFramerate();
     }
     // @property
     // def timelen(self):
@@ -115,7 +121,7 @@ namespace TBSKmodemCPP
     //     """
     //     return len(self._frames)
     int PcmData::GetByteslen()const {
-        return this->_wavfile.GetData()->GetSize();
+        return this->_wavfile->GetData()->GetSize();
     }
     // @property
     // def data(self)->bytes:
@@ -153,13 +159,13 @@ namespace TBSKmodemCPP
 
 
 
-    std::unique_ptr<std::vector<double>> PcmData::DataAsFloat()
+    const unique_ptr<vector<double>> PcmData::DataAsFloat()
     {
-        const TBSK_BYTE* data = (const TBSK_BYTE*)this->_wavfile.GetData()->GetData();
-        auto data_size = this->_wavfile.GetData()->GetSize();
+        const TBSK_BYTE* data = (const TBSK_BYTE*)this->_wavfile->GetData()->GetData();
+        auto data_size = this->_wavfile->GetData()->GetSize();
         auto bits = this->GetSampleBits();
 
-        auto ret = std::unique_ptr<std::vector<double>>();
+        auto ret = unique_ptr<vector<double>>();
         if (bits == 8) {
             for (auto i = 0;i < data_size;i++) {
                 ret->push_back(*(data + i) / 255. - 0.5);
@@ -191,7 +197,7 @@ namespace TBSKmodemCPP
             }
             return ret;
         }
-        throw std::invalid_argument("invalid bits");
+        throw invalid_argument("invalid bits");
     }
 
 

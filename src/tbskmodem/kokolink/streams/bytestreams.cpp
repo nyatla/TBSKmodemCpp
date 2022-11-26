@@ -3,7 +3,6 @@
 #include "bytestreams.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     int BasicByteStream::GetAsUInt32be() {
         int r = 0;

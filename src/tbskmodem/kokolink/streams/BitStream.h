@@ -2,23 +2,21 @@
 #include "../interfaces.h"
 #include "./rostream.h"
 #include "../utils/BitsWidthConvertIterator.h"
-#include <memory>
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 #pragma warning( disable : 4250 )
     class BitStream :public virtual IBitStream,public BasicRoStream<int>
     {
     private:
         TBSK_INT64 _pos;
-        BitsWidthConvertIterator _bw;
+        const unique_ptr<BitsWidthConvertIterator> _bw;
 
         // """ 任意ビット幅のintストリームを1ビット単位のビットストリームに展開します。
         // """
     public:
-        BitStream(shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8);
+        BitStream(const shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8);
         virtual ~BitStream();
         int Next()override;
         TBSK_INT64 GetPos()const override;

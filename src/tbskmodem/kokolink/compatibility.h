@@ -3,6 +3,22 @@
 #include <vector>
 #include <iterator>
 #include <memory>
+#include <fstream>
+#include <iostream>
+
+namespace TBSKmodemCPP
+{
+    class NoneCopyConstructor_class
+    {
+    public:
+        NoneCopyConstructor_class();
+        virtual ~NoneCopyConstructor_class();
+    public:
+        // コピー禁止 (C++11)
+        NoneCopyConstructor_class(const NoneCopyConstructor_class&) = delete;
+        NoneCopyConstructor_class& operator=(const NoneCopyConstructor_class&) = delete;
+    };
+}
 
 
 namespace TBSKmodemCPP
@@ -25,13 +41,13 @@ namespace TBSKmodemCPP
     {
     public:
         BinaryReaderException() :std::exception() {};
-        virtual ~BinaryReaderException();
+        virtual ~BinaryReaderException() {};
     };
 
     class IBinaryReader {
     public:
         //  必要なサイズを読みだせない場合BinaryReaderException
-        virtual size_t ReadBytes(size_t size, void* buf) = 0;
+        virtual void ReadBytes(size_t size, void* buf) = 0;
         virtual void ReadInt32LE(int* buf) = 0;
         virtual void ReadInt16LE(short* buf) = 0;
     };
@@ -39,95 +55,109 @@ namespace TBSKmodemCPP
     public:
         //  必要なサイズを読みだせない場合BinaryReaderException
         virtual size_t WriteBytes(size_t size, const void* buf) = 0;
-        //virtual void ReadInt32LE(int* buf) = 0;
-        //virtual void ReadInt16LE(short* buf) = 0;
 
     };
+}
+namespace TBSKmodemCPP
+{
+
+    class FileReader :public IBinaryReader {
+    private:
+        unique_ptr<std::ifstream> _ifs;
+    public:  
+        FileReader(const char* path);
+        virtual ~FileReader();
+        void ReadBytes(size_t size, void* buf);
+        void ReadInt32LE(int* buf);
+        void ReadInt16LE(short* buf);
+    };
+
+    class FileWriter:public IBinaryWriter {
+    private:
+        unique_ptr<std::ofstream> _ofs;
+    public:
+        FileWriter(const char* path);
+        virtual ~FileWriter();
+        //  必要なサイズを読みだせない場合BinaryReaderException
+        size_t WriteBytes(size_t size, const void* buf)override;
+
+    };
+
 }
 
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
-    template <typename T> class PyIterator :public virtual IPyIterator<T>
+    template <typename T> class VectorWrapper :public NoneCopyConstructor_class
     {
-
-    private:
-        shared_ptr<const vector<T>> _src;
-        size_t _ptr;
     public:
-        //PyIterator(const vector<T>* src);
-        PyIterator(const unique_ptr<const vector<T>>&& src);
-        PyIterator(const shared_ptr<const vector<T>>&& src);
-
-        T Next()override;
+        const vector<T>* _buf;
+    public:
+        VectorWrapper(const vector<T>* src) :_buf{ src } {}
     };
 
 
-
-    //// srcポインタをインスタンスにアタッチするPyIterator
-    //// srcポインタの寿命はこのインスタンスに同期します。
-    ////
-    //template <typename T> class AttachedPyIterator :public PyIterator<T>
-    //{
-
-    //private:
-    //    std::vector<T>* _attached;
-    //public:
-    //    AttachedPyIterator(std::vector<T>* src) :PyIterator<T>(*src), _attached{ src } {
-    //    }
-    //    virtual ~AttachedPyIterator() {
-    //        TBSK_SAFE_DELETE(this->_attached);
-    //    }
-    //};
+    template <typename T> class PyIterator :public NoneCopyConstructor_class, public virtual IPyIterator<T>
+    {
+    private:
+        size_t _ptr = 0;
+        const unique_ptr<VectorWrapper<T>> _src;
+    public:
+        //PyIterator(const vector<T>* src);
+        PyIterator(const unique_ptr<const vector<T>>&& src);//参照
+        PyIterator(const shared_ptr<const vector<T>>&& src);//共有
+        PyIterator(const vector<T>& src);//参照
+        T Next()override;
+    };
 
 }
     
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
+    using std::make_unique;
 
     class Functions {
     public:
-        template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(shared_ptr<const vector<T>>&& src) {
-            return make_unique<PyIterator<T>>(src);
-        }
-        template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(shared_ptr<vector<T>>& src) {
-            return make_unique<PyIterator<T>>(src);
-        }
-        template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(shared_ptr<vector<T>>&& src) {
-            return make_unique<PyIterator<T>>(src);
-        }
-        template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(unique_ptr<const vector<T>>&& src) {
-            return make_unique<PyIterator<T>>(src);
-        }
-        template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(unique_ptr<vector<T>>&& src) {
-            return make_unique<PyIterator<T>>(src);
-        }
+        //template <typename T> IPyIterator<T> ToPyIterator(shared_ptr<const vector<T>>&& src) {
+        //    return new PyIterator<T>>(src);
+        //}
+        //template <typename T> IPyIterator < T ToPyIterator(shared_ptr<vector<T>>& src) {
+        //    return make_unique<PyIterator<T>>(src);
+        //}
+        //template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(shared_ptr<vector<T>>&& src) {
+        //    return make_unique<PyIterator<T>>(src);
+        //}
+        //template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(unique_ptr<const vector<T>>&& src) {
+        //    return make_unique<PyIterator<T>>(src);
+        //}
+        //template <typename T> static unique_ptr <IPyIterator<T>> ToPyIterator(unique_ptr<vector<T>>&& src) {
+        //    return make_unique<PyIterator<T>>(src);
+        //}
 
 
 
 
     public:
         //vctorを接続した新しいvectorを割り当てて返す。
-        template <typename T> static std::vector<T>* Flatten(const std::vector<std::vector<T>>& s);
-
-        template <typename T> static std::vector<T>* Repeat(int n, T pad);
+        template <typename T> static vector<T>* Flatten(const std::vector<std::vector<T>>& s);
     };
 }
 
 namespace TBSKmodemCPP
 {
 
-    class MemBuffer {
+    class MemBuffer:public NoneCopyConstructor_class
+    {
     private:
-        std::vector<TBSK_BYTE> _buf;
-        size_t _WriteBytes(const void* v, size_t l);
+        unique_ptr<vector<TBSK_BYTE>> _buf;
+        size_t _WriteBytes(const TBSK_BYTE* v, size_t l);
     public:
+        MemBuffer(int i);
         const void* GetPtr();
         size_t WriteBytes(IBinaryReader& v, size_t size, int padding = 0);
-        size_t WriteBytes(const void* v, size_t size, int padding = 0);
+        size_t WriteBytes(const TBSK_BYTE* v, size_t size, int padding = 0);
+        size_t WriteBytes(const char* v, size_t size, int padding = 0) {return this->WriteBytes((const TBSK_BYTE*)v, size, padding); };
         size_t WriteInt16LE(const size_t v);
         size_t WriteInt32LE(const size_t v);
         TBSK_INT32 AsInt32LE(const size_t idx)const;
@@ -141,92 +171,6 @@ namespace TBSKmodemCPP
 }
 
 
-    //}
-
-    //class BinUtils
-    //{
-    //    static public byte[] Ascii2byte(string s)
-    //    {
-    //        return System.Text.Encoding.ASCII.GetBytes(s);
-    //    }
-    //    static public UInt16 Bytes2Uint16LE(byte[] b, int s)
-    //    {
-    //        return (UInt16)((b[s + 1] << 8) | b[s + 0]);
-    //    }
-    //    static public UInt16 Bytes2Uint16LE(byte[] b)
-    //    {
-    //        return Bytes2Uint16LE(b, 0);
-    //    }
-
-    //    static public UInt32 Bytes2Uint32LE(byte[] b, int s)
-    //    {
-    //        return (UInt32)((b[s + 3] << 24) | (b[s + 2] << 16) | (b[s + 1] << 8) | b[s + 0]);
-    //    }
-    //    static public UInt32 Bytes2Uint32LE(byte[] b)
-    //    {
-    //        return Bytes2Uint32LE(b, 0);
-    //    }
-    //    static public UInt32 ReadUint32LE(Stream fp)
-    //    {
-    //        return BinUtils.Bytes2Uint32LE(ReadBytes(fp,4)); //LE
-    //    }
-    //    static public byte[] Uint16LE2Bytes(int s)
-    //    {
-    //        return new byte[] { (byte)((s >> 0) & 0xff), (byte)((s >> 8) & 0xff) };
-    //    }
-    //    static public byte[] Uint32LE2Bytes(int s)
-    //    {
-    //        return new byte[] { (byte)((s >> 0) & 0xff), (byte)((s >> 8) & 0xff), (byte)((s >> 16) & 0xff), (byte)((s >> 24) & 0xff) };
-    //    }
-    //    static public bool IsEqualAsByte(byte[] a, string b)
-    //    {
-    //        return a.SequenceEqual(BinUtils.Ascii2byte(b));
-    //    }
-    //    static public byte[] ReadBytes(Stream fp, int size)
-    //    {
-    //        var ret = new byte[size];
-    //        for(var i = 0; i < size; i++)
-    //        {
-    //            var w=fp.ReadByte();
-    //            if (w < 0)
-    //            {
-    //                throw new EndOfStreamException();
-    //            }
-    //            ret[i] = (byte)w;
-    //        }
-    //        return ret;
-    //    }
-
-
-    //    static public byte[] ToByteArray(IEnumerable<int> s)
-    //    {
-    //        using (var ms = new MemoryStream())
-    //        {
-    //            foreach (var i in s)
-    //            {
-    //                Debug.Assert(i >= 0 && i <= 255);
-    //                ms.WriteByte((byte)i);
-    //            }
-    //            ms.Flush();
-    //            return ms.ToArray();
-    //        }
-    //    }
-    //    static public byte[] ToByteArray(IEnumerable<uint> s)
-    //    {
-    //        using (var ms = new MemoryStream())
-    //        {
-    //            foreach (var i in s)
-    //            {
-    //                Debug.Assert(i >= 0 && i <= 255);
-    //                ms.WriteByte((byte)i);
-    //            }
-    //            ms.Flush();
-    //            return ms.ToArray();
-    //        }
-    //    }
-
-
-    //}
 
 
 

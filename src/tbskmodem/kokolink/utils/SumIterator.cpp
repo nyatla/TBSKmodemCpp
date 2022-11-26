@@ -2,12 +2,11 @@
 #include <math.h>
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 
     SumIterator::SumIterator(const shared_ptr<IPyIterator<double>>& src, int length) :
         _src{src},
-        _buf{RingBuffer<double>(length,0.) }
+        _buf{make_unique<RingBuffer<double>>(length,0.) }
     {
         this->_sum=0;
         // # self._length=length
@@ -23,7 +22,7 @@ namespace TBSKmodemCPP
     double SumIterator::Next()
     {
         auto s=this->_src->Next();
-        auto d=this->_buf.Append(s);
+        auto d=this->_buf->Append(s);
         this->_sum=this->_sum+s-d;
         // # self._num_of_input=self._num_of_input+1
         return this->_sum;
@@ -32,7 +31,7 @@ namespace TBSKmodemCPP
     // def buf(self)->RingBuffer[T]:
     //     return self._buf
     const RingBuffer<double>& SumIterator::GetBuf() const{
-        return this->_buf;
+        return *this->_buf.get();
     }
 }
 

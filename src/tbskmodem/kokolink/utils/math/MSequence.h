@@ -4,7 +4,6 @@
 #include <vector>
 namespace TBSKmodemCPP
 {
-    using namespace std;
     class MSequence:IPyIterator<int> {
     private:
         const int _bits;

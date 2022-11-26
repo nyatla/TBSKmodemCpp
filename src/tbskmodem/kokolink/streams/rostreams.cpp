@@ -3,8 +3,6 @@
 #include <queue>
 namespace TBSKmodemCPP
 {
-    using namespace std;
-
 
     template <typename T> BasicRoStream<T>::BasicRoStream()
     {

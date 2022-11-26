@@ -3,155 +3,164 @@
 namespace TBSKmodemCPP
 {
 
-
-
-
-
     //};
 
     // """チャンクのベースクラス。
     // """
 
     Chunk::Chunk(IBinaryReader& fp) :
-        _buf{MemBuffer()},
-        _name{ this->_buf.WriteBytes(fp, 4) },
-        _size{ this->_buf.WriteBytes(fp, 4) }
+        _buf{make_unique<MemBuffer>(1)},
+        _name{ this->_buf->WriteBytes(fp, 4) },
+        _size{ this->_buf->WriteBytes(fp, 4) }
     {
     }
 
-    Chunk::Chunk(const char* name, int size):
-        _buf{MemBuffer()},
-        _name{ this->_buf.WriteBytes(name, 4) },
-        _size{ this->_buf.WriteInt32LE(size) }
+    Chunk::Chunk(const char* name, size_t size) :
+        _buf{ make_unique<MemBuffer>(1) },
+        _name{ this->_buf->WriteBytes(name, 4) },
+        _size{ this->_buf->WriteInt32LE(size) }
 
     {
         TBSK_ASSERT(strnlen_s(name, 5) <= 4);
     }
+    Chunk::~Chunk(){}
+
     // @property
     // def name(self)->bytes:
     //     return self._name
     const char* Chunk::GetName()const
     {
-        return this->_buf.AsCharPtr(this->_name);
+        return this->_buf->AsCharPtr(this->_name);
     }
     int Chunk::GetSize()const
     {
-        return this->_buf.AsInt32LE(this->_size);
+        return this->_buf->AsInt32LE(this->_size);
+    }
+    size_t Chunk::Dump(IBinaryWriter& writer)const {
+        return this->_buf->Dump(writer);
     }
 
+}
+namespace TBSKmodemCPP
+{
 
 
-    RawChunk::RawChunk(const char* name,int size, IBinaryReader& fp) :Chunk(name,size),
-        _data{ this->_buf.WriteBytes(fp,this->GetSize() + this->GetSize() % 2) }
+    RawChunk::RawChunk(const char* name, size_t size, IBinaryReader& fp) :Chunk(name,size),
+        _data{ this->_buf->WriteBytes(fp,this->GetSize() + this->GetSize() % 2) }
     {
     }
 
-    RawChunk::RawChunk(const char* name, const TBSK_BYTE* data, int data_len) :Chunk(name, data_len),
-        _data{ this->_buf.WriteBytes(data,data_len,data_len % 2) }    //data+padding
+    RawChunk::RawChunk(const char* name, const TBSK_BYTE* data, size_t data_len) :Chunk(name, data_len),
+        _data{ this->_buf->WriteBytes(data,data_len,data_len % 2) }    //data+padding
     {
     }
 
 
     const void* RawChunk::GetData()const
     {
-        return this->_buf.AsBytesPtr(this->_data);
+        return this->_buf->AsBytesPtr(this->_data);
     }
 
 
-
-
-
-
+}
+namespace TBSKmodemCPP
+{
     FmtChunk::FmtChunk(int size, IBinaryReader& fp) :Chunk("fmt ",size)
     {
-        this->_buf.WriteBytes(fp, 2);
-        this->_buf.WriteBytes(fp, 2);
-        this->_buf.WriteBytes(fp, 4);
-        this->_buf.WriteBytes(fp, 4);
-        this->_buf.WriteBytes(fp, 2);
-        this->_buf.WriteBytes(fp, 2);
+        this->_buf->WriteBytes(fp, 2);
+        this->_buf->WriteBytes(fp, 2);
+        this->_buf->WriteBytes(fp, 4);
+        this->_buf->WriteBytes(fp, 4);
+        this->_buf->WriteBytes(fp, 2);
+        this->_buf->WriteBytes(fp, 2);
     }
 
     FmtChunk::FmtChunk(int framerate, int samplewidth, int nchannels) :Chunk("fmt ", FmtChunk::CHUNK_SIZE)
     {
-        this->_buf.WriteInt16LE(WAVE_FORMAT_PCM); //+0
-        this->_buf.WriteInt16LE(nchannels);//+2
-        this->_buf.WriteInt32LE(framerate);//+4
-        this->_buf.WriteInt32LE(nchannels * framerate * samplewidth);//+8
-        this->_buf.WriteInt16LE(nchannels * samplewidth);//+12
-        this->_buf.WriteInt16LE(samplewidth * 8);//+14
+        this->_buf->WriteInt16LE(WAVE_FORMAT_PCM); //+0
+        this->_buf->WriteInt16LE(nchannels);//+2
+        this->_buf->WriteInt32LE(framerate);//+4
+        this->_buf->WriteInt32LE((std::size_t)nchannels * framerate * samplewidth);//+8
+        this->_buf->WriteInt16LE((std::size_t)nchannels * samplewidth);//+12
+        this->_buf->WriteInt16LE((std::size_t)samplewidth * 8);//+14
     }
     int FmtChunk::GetNchannels()const
     {
-        return this->_buf.AsInt16LE(2);
+        return this->_buf->AsInt16LE(2);
     }
 
     unsigned int FmtChunk::GetFramerate()const
     {
-        return (unsigned int)this->_buf.AsInt32LE(4);
+        return (unsigned int)this->_buf->AsInt32LE(4);
     }
 
     int FmtChunk::GetSamplewidth()const
     {
-        return this->_buf.AsInt16LE(14);
+        return this->_buf->AsInt16LE(14);
     }
 
+}
+namespace TBSKmodemCPP
+{
 
 
-
-    DataChunk::DataChunk(int size, IBinaryReader& fp) :RawChunk("data", size, fp)
+    DataChunk::DataChunk(size_t size, IBinaryReader& fp) :RawChunk("data", size, fp)
     {
     }
-    DataChunk::DataChunk(const TBSK_BYTE* data, int data_len) :RawChunk("data", data, data_len)
+    DataChunk::DataChunk(const TBSK_BYTE* data, size_t data_len) :RawChunk("data", data, data_len)
     {
     }
 
-
+}
+namespace TBSKmodemCPP
+{
     ChunkHeader::ChunkHeader(IBinaryReader& fp) :Chunk(fp),
-        _form{ this->_buf.WriteBytes(fp, 4) }
+        _form{ this->_buf->WriteBytes(fp, 4) }
     {
     }
-    ChunkHeader::ChunkHeader(const char* name, int size, IBinaryReader& fp) :Chunk(name, size),
-        _form{this->_buf.WriteBytes(fp, 4) }
+    ChunkHeader::ChunkHeader(const char* name, size_t size, IBinaryReader& fp) :Chunk(name, size),
+        _form{this->_buf->WriteBytes(fp, 4) }
     {
     }
 
-    ChunkHeader::ChunkHeader(const char* name, int size, const char* form) :Chunk(name, size),
-        _form{ this->_buf.WriteBytes(form, 4) }
+    ChunkHeader::ChunkHeader(const char* name, size_t size, const char* form) :Chunk(name, size),
+        _form{ this->_buf->WriteBytes(form, 4) }
     {
     }
     const char* ChunkHeader::GetForm()
     {
-        return this->_buf.AsCharPtr(this->_form);
+        return this->_buf->AsCharPtr(this->_form);
     }
 
-
+}
+namespace TBSKmodemCPP
+{
 
 
     RiffHeader::RiffHeader(IBinaryReader& fp) :ChunkHeader(fp)
     {
         TBSK_ASSERT(strncmp(this->GetName(), "RIFF", 4) == 0);
     }
-    RiffHeader::RiffHeader(int size, const char* form) :ChunkHeader("RIFF", size, form)
+    RiffHeader::RiffHeader(size_t size, const char* form) :ChunkHeader("RIFF", size, form)
     {
     }
 
     RawListChunk::RawListChunk(IBinaryReader& fp) :ChunkHeader(fp),
-        _payload{ this->_buf.WriteBytes(fp,this->GetSize() - 4) }//fmtの文だけ引く
+        _payload{ this->_buf->WriteBytes(fp,this->GetSize() - 4) }//fmtの文だけ引く
     {
         TBSK_ASSERT(strncmp(this->GetName(), "LIST", 4) == 0);
     }
     RawListChunk::RawListChunk(int size, IBinaryReader& fp) :ChunkHeader("LIST", size, fp),
-        _payload{ this->_buf.WriteBytes(fp, this->GetSize() - 4) }//fmtの文だけ引く
+        _payload{ this->_buf->WriteBytes(fp, this->GetSize() - 4) }//fmtの文だけ引く
     {
         TBSK_ASSERT(strncmp(this->GetName(), "LIST", 4) == 0);
     }
-    RawListChunk::RawListChunk(const char* form, const char* payload, int payload_len) :ChunkHeader("LIST", payload_len + 4, form),
-        _payload{ this->_buf.WriteBytes(payload,payload_len) }//fmtの文だけ引く
+    RawListChunk::RawListChunk(const char* form, const TBSK_BYTE* payload, int payload_len) :ChunkHeader("LIST", payload_len + 4, form),
+        _payload{ this->_buf->WriteBytes(payload,payload_len) }//fmtの文だけ引く
     {
     }
     const void* RawListChunk::GetPayload() {
-        return this->_buf.AsBytesPtr(this->_payload);
+        return this->_buf->AsBytesPtr(this->_payload);
     }
 
    //// """Info配下のチャンクを格納するクラス
@@ -284,9 +293,11 @@ namespace TBSKmodemCPP
     //    //}
     //}
 
-
+}
+namespace TBSKmodemCPP
+{
     WaveFile::WaveFile(IBinaryReader& fp) :RiffHeader(fp),
-        _chunks{std::vector<std::shared_ptr<const Chunk>>()}
+        _chunks{ std::vector<std::shared_ptr<const Chunk>>() }
     {
         TBSK_ASSERT(strncmp(this->GetForm(), "WAVE", 4) == 0);
         auto chunk_size = this->GetSize();
@@ -294,7 +305,12 @@ namespace TBSKmodemCPP
         while (chunk_size > 8)
         {
             char name[4];
-            fp.ReadBytes(4, name);
+            try {
+                fp.ReadBytes(4, name);
+            }
+            catch (const BinaryReaderException& e) {
+                break;
+            }
             int size;
             fp.ReadInt32LE(&size);
             chunk_size -= 8;
@@ -312,27 +328,37 @@ namespace TBSKmodemCPP
             }
         }
     }
-    static int toSize(int frames_len,std::vector<std::shared_ptr<const Chunk>>& extchunks) {
-        int s = 4;//form
+    static size_t toSize(size_t frames_len,const vector<shared_ptr<const Chunk>>* extchunks=NULL) {
+        size_t s = 4;//form
         s = s + FmtChunk::CHUNK_SIZE + 8;
         s = s + frames_len + 8;
-        for (int i = 0;i < extchunks.size();i++) {
-            auto cs = extchunks.at(i)->GetSize();
-            s = s + cs + cs % 2 + 8;
+        if (extchunks != NULL) {
+            for (int i = 0;i < extchunks->size();i++) {
+                auto cs = extchunks->at(i)->GetSize();
+                s = s + cs + cs % 2 + 8;
+            }
         }
         return s;
     }
-    WaveFile::WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, int frames_len, std::vector<std::shared_ptr<const Chunk>>& extchunks) :
-        RiffHeader(toSize(frames_len, extchunks), "WAVE"), _chunks{std::vector<std::shared_ptr<const Chunk>>() }
+    WaveFile::WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, size_t frames_len, const vector<shared_ptr<const Chunk>>& extchunks) :
+        RiffHeader(toSize(frames_len,&extchunks), "WAVE"), _chunks{ std::vector<shared_ptr<const Chunk>>() }
     {
         this->_chunks.push_back(std::make_shared<FmtChunk>(samplerate, samplewidth, nchannel));
-        this->_chunks.push_back(std::make_shared<DataChunk>(frames,frames_len));
+        this->_chunks.push_back(std::make_shared<DataChunk>(frames, frames_len));
         //if (extchunks != NULL) {
         for (auto i = 0;i < extchunks.size();i++) {
-            this->_chunks.push_back(std::move(extchunks.at(i)));
+            this->_chunks.push_back(extchunks.at(i));
         }
-        extchunks.clear();
     }
+
+    WaveFile::WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, std::size_t frames_len) :
+        RiffHeader(toSize(frames_len,NULL), "WAVE"), _chunks{vector<shared_ptr<const Chunk>>() }
+    {
+        this->_chunks.push_back(std::make_shared<FmtChunk>(samplerate, samplewidth, nchannel));
+        this->_chunks.push_back(std::make_shared<DataChunk>(frames, frames_len));
+    }
+
+
 
     const DataChunk* WaveFile::GetData()const {
         auto ret=this->GetChunk("data");

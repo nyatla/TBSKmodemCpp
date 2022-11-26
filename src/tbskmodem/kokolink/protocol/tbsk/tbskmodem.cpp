@@ -14,17 +14,16 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     class DiffBitEncoder : public BasicRoStream<int>, virtual public IBitStream
     {
     private:
-        shared_ptr<IRoStream<int>> _src;
+        const shared_ptr<IRoStream<int>> _src;
         int _last_bit;
         bool _is_eos;
         int _pos;
     public:
-        DiffBitEncoder(int firstbit, shared_ptr<IRoStream<int>>& src) :BasicRoStream(),
+        DiffBitEncoder(int firstbit, const shared_ptr<IRoStream<int>>& src) :BasicRoStream(),
             _src{ src }
         {
             this->_last_bit = firstbit;
@@ -78,9 +77,14 @@ namespace TBSKmodemCPP
 
 }
 
+
 namespace TBSKmodemCPP
 {
-    using namespace std;
+    using std::make_shared;
+    using std::max;
+}
+namespace TBSKmodemCPP
+{
 
     // """ TBSKの変調クラスです。
     //     プリアンブルを前置した後にビットパターンを置きます。
@@ -91,26 +95,26 @@ namespace TBSKmodemCPP
         const shared_ptr<const TraitTone> _tone;
         const shared_ptr<const Preamble> _preamble;
 
-        TraitBlockEncoder _enc;
+        const unique_ptr<TraitBlockEncoder> _enc;
     public:
         TbskModulator(const shared_ptr<const TraitTone>& tone) :
             _tone{ tone },
             _preamble{ make_shared<const CoffPreamble>(tone) },
-            _enc{ TraitBlockEncoder(tone) }
+            _enc{make_unique<TraitBlockEncoder>(tone) }
         {
         }
 
         TbskModulator(const shared_ptr<const TraitTone>& tone, shared_ptr<const Preamble>& preamble) :
             _tone{ tone },
             _preamble{ preamble },
-            _enc{ TraitBlockEncoder(tone) }
+            _enc{make_unique<TraitBlockEncoder>(tone) }
         {
         }
         virtual ~TbskModulator() {
         }
 
     private:
-        IPyIterator<double>* ModulateAsBit(shared_ptr<IRoStream<int>>&& src)
+        IPyIterator<double>* ModulateAsBit(const shared_ptr<IRoStream<int>>&& src)
         {
             auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
 
@@ -130,7 +134,7 @@ namespace TBSKmodemCPP
         }
 
 
-        IPyIterator<double>* Modulate(shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8)
+        IPyIterator<double>* Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8)
         {
             auto s = make_shared<BitsWidthFilter>(bitwidth);
             s->SetInput(make_shared<RoStream<int>>(src));
@@ -154,9 +158,6 @@ namespace TBSKmodemCPP
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
-
-
 
 
 
@@ -397,7 +398,7 @@ namespace TBSKmodemCPP
                 }
                 virtual ~CharFilter() {
                 }
-                CharFilter& SetInput(shared_ptr<IRoStream<int>>&& src)override
+                CharFilter& SetInput(const shared_ptr<IRoStream<int>>&& src)override
                 {
                     this->_pos = 0;
                     this->_iter = make_unique<BitsWidthConvertIterator>(src, 1, 8);

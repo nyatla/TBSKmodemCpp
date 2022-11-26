@@ -1,11 +1,15 @@
 #include "BitStream.h"
-
+#include <memory>
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
-    BitStream::BitStream(shared_ptr<IPyIterator<int>>&& src, int bitwidth) :
-        _bw{BitsWidthConvertIterator(dynamic_pointer_cast<IPyIterator<int>>(src), bitwidth, 1) }
+    using std::make_unique;
+    using std::dynamic_pointer_cast;
+}
+namespace TBSKmodemCPP
+{
+    BitStream::BitStream(const shared_ptr<IPyIterator<int>>&& src, int bitwidth) :
+        _bw{make_unique<BitsWidthConvertIterator>(dynamic_pointer_cast<IPyIterator<int>>(src), bitwidth, 1) }
     {
         this->_pos = 0;
     }
@@ -15,7 +19,7 @@ namespace TBSKmodemCPP
     {
         int r;
         try {
-            r = this->_bw.Next();
+            r = this->_bw->Next();
         }
         catch (RecoverableStopIteration e) {
             throw e;

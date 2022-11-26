@@ -1,10 +1,11 @@
 #include "toneblock.h"
+#include <math.h>
 
 
 
 namespace TBSKmodemCPP
 {
-    TraitTone::TraitTone() :std::vector<double>()
+    TraitTone::TraitTone() :vector<double>()
     {
     }
     // """ 信号強度をv倍します。
@@ -26,7 +27,7 @@ namespace TBSKmodemCPP
     SinTone::SinTone(int points, int cycle) :TraitTone()
     {
         auto s = TBSK_PI * 2 / points * 0.5;
-        auto d1 = std::vector<double>();
+        auto d1 = vector<double>();
         for (auto i = 0; i < points; i++)
         {
             d1.push_back((double)sin(s + i * TBSK_PI * 2 / points));

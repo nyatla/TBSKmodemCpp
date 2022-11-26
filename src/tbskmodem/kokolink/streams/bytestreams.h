@@ -5,7 +5,6 @@
 #include <queue>
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 #pragma warning( disable : 4250 )
     class BasicByteStream :public virtual IByteStream,public BasicRoStream<int> {

@@ -1,7 +1,6 @@
 #include "Bits2StrFilter.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     Bits2StrFilter::Bits2StrFilter(int input_bits, const char* encoding) :BasicRoStream(),
         _encoding{ encoding },
@@ -14,11 +13,11 @@ namespace TBSKmodemCPP
     }
     Bits2StrFilter::~Bits2StrFilter() {
     }
-    Bits2StrFilter& Bits2StrFilter::SetInput(shared_ptr<IRoStream<int>>&& src)
+    Bits2StrFilter& Bits2StrFilter::SetInput(const shared_ptr<IRoStream<int>>&& src)
     {
         this->_pos = 0;
         this->_savedata.clear();
-        this->_iter = move(make_unique<BitsWidthConvertIterator>(move(src), this->_input_bits, 8));
+        this->_iter = move(make_unique<BitsWidthConvertIterator>(src, this->_input_bits, 8));
         return *this;
     }
     char Bits2StrFilter::Next()

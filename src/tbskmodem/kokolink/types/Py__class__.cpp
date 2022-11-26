@@ -1,11 +1,9 @@
 
 #include "Py__class__.h"
 #include "types.h"
-#include "../compatibility.h"
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     PyStopIteration::PyStopIteration() :exception()
     {
@@ -15,7 +13,7 @@ namespace TBSKmodemCPP
     {
 
     }
-    template <typename T> IterChain<T>::IterChain(shared_ptr<vector<shared_ptr<IPyIterator<T>>>> &src)
+    template <typename T> IterChain<T>::IterChain(const shared_ptr<vector<shared_ptr<IPyIterator<T>>>> &src)
     {
         this->_src = src;
         this->_current = NULL;

@@ -8,7 +8,6 @@
 namespace TBSKmodemCPP
 {
 
-    using namespace std;
 #pragma warning( disable : 4250 )
 
 
@@ -25,7 +24,7 @@ namespace TBSKmodemCPP
     public:
         Bits2StrFilter(int input_bits = 1, const char* encoding = "ascii");
         virtual ~Bits2StrFilter();
-        Bits2StrFilter& SetInput(shared_ptr<IRoStream<int>>&& src)override;
+        Bits2StrFilter& SetInput(const shared_ptr<IRoStream<int>>&& src)override;
         char Next()override;
         TBSK_INT64 GetPos()const override;
     };

@@ -5,7 +5,6 @@
 #include <memory>
 namespace TBSKmodemCPP
 {
-    using namespace std;
     // from math import sqrt
     // from typing import Union
 

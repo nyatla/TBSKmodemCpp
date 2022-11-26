@@ -2,10 +2,11 @@
 #include <math.h>
 #include <vector>
 #include <iterator>
-
+namespace TBSKmodemCPP {
+    using std::make_unique;
+}
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     MSequence::MSequence(int bits, int tap, TBSK_UINT32 sr):
         _bits{bits},

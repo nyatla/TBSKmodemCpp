@@ -2,8 +2,6 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
-
 
     Bits2BytesFilter::Bits2BytesFilter(int input_bits) :
         _input_bits{input_bits},
@@ -14,10 +12,10 @@ namespace TBSKmodemCPP
     Bits2BytesFilter::~Bits2BytesFilter() {
     }
 
-    Bits2BytesFilter& Bits2BytesFilter::SetInput(shared_ptr<IRoStream<int>>&& src)
+    Bits2BytesFilter& Bits2BytesFilter::SetInput(const shared_ptr<IRoStream<int>>&& src)
     {
         this->_pos = 0;
-        this->_iter = move(make_unique<BitsWidthConvertIterator>(move(src), this->_input_bits, 8));
+        this->_iter =make_unique<BitsWidthConvertIterator>(src, this->_input_bits, 8);
         return *this;
     }
     TBSK_BYTE Bits2BytesFilter::Next()

@@ -1,15 +1,15 @@
 #pragma once
 #include "../types/types.h"
-#include "../types/Py__special_functions__.h"
+#include "../compatibility.h"
 #include <vector>
 #include <string>
 #include <memory>
 namespace TBSKmodemCPP
 {
 
-    using namespace std;
 
-    template <typename T> class RingBuffer : public Py__repr__, Py__len__
+
+    template <typename T> class RingBuffer:public NoneCopyConstructor_class
     {
     private:
         vector<T> _buf;
@@ -60,7 +60,5 @@ namespace TBSKmodemCPP
         // def __len__(self)->int:
         //     return len(self._buf)
         int GetLength()const;
-
-        string __repr__()const;
     };
 }

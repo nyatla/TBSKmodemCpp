@@ -8,7 +8,6 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     class ASwaitForSymbol;
 
@@ -28,7 +27,7 @@ namespace TBSKmodemCPP
     public:
         shared_ptr<IRoStream<double>> GetPreamble()const override;
     public:
-        NullableResult<TBSK_INT64> WaitForSymbol(shared_ptr<IRoStream<double>>&& src) override;
+        NullableResult<TBSK_INT64> WaitForSymbol(const shared_ptr<IRoStream<double>>&& src) override;
     };
 }
 

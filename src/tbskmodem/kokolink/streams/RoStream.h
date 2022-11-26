@@ -5,7 +5,6 @@
 #include "./rostreams.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     // """T型のRoStreamです。
     // """

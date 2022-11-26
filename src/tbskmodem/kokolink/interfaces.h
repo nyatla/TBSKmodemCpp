@@ -1,14 +1,18 @@
 #pragma once
-#include "types/Py__special_functions__.h"
-#include "types/Py__class__.h"
-
-#include "types/types.h"
+#include "./types/types.h"
+#include "./types/Py__interface__.h"
 #include <vector>
 #include <memory>
 
+namespace TBSKmodemCPP {
+    using std::vector;
+    using std::unique_ptr;
+    using std::shared_ptr;
+}
+
 namespace TBSKmodemCPP
 {
-    using namespace std;
+
 
     template <typename T> class IRecoverableIterator : public virtual IPyIterator<T>
     {
@@ -94,7 +98,7 @@ namespace TBSKmodemCPP
         //         """
         //         pass
     public:
-        virtual IMPL& SetInput(shared_ptr<S>&& src) = 0;
+        virtual IMPL& SetInput(const shared_ptr<S>&& src) = 0;
 
         virtual ~IFilter() {}
     };

@@ -43,7 +43,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -105,6 +105,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,7 +142,7 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\RoStream.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\rostreams.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__class__.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__special_functions__.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__interface__.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\types.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.h" />

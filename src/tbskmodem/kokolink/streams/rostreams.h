@@ -7,7 +7,7 @@
 #include <memory>
 namespace TBSKmodemCPP
 {
-    using namespace std;
+    using std::queue;
 #pragma warning( disable : 4250 )
 
     template <typename T> class BasicRoStream:public virtual IRoStream<T>,public BasicIterator<T>

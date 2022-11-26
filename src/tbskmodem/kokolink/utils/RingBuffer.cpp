@@ -1,7 +1,7 @@
 #include "RingBuffer.h"
 
 namespace TBSKmodemCPP{
-    using namespace std;
+
 
 
 

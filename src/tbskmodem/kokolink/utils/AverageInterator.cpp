@@ -1,7 +1,6 @@
 #include "AverageInterator.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
     AverageInterator::AverageInterator(const shared_ptr<IPyIterator<double>>&& src, int ticks) : SumIterator(src, ticks),
         _length(ticks)
     {

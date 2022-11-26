@@ -1,7 +1,6 @@
 #include "./BitsWidthConvertIterator.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 
     BitsWidthConvertIterator::BitsWidthConvertIterator(shared_ptr<IPyIterator<int>>&& src, int input_bits, int output_bits) :

@@ -8,13 +8,10 @@
 #include "../../utils/math/corrcoef/SelfCorrcoefIterator.h"
 #include <queue>
 #include <math.h>
-namespace TBSKmodemCPP
-{
 
-}
+
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     // """ ビット列をTBSK変調した振幅信号に変換します。出力レートは入力のN倍になります。
     //     N=len(trait_block)*2*len(tone)
@@ -38,7 +35,7 @@ namespace TBSKmodemCPP
     public:
         TraitBlockEncoder(const shared_ptr<const TraitTone>& tone);
         virtual ~TraitBlockEncoder();
-        TraitBlockEncoder& SetInput(shared_ptr<IBitStream>&& src)override;
+        TraitBlockEncoder& SetInput(const shared_ptr<IBitStream>&& src)override;
         double Next()override;
         // @property
         TBSK_INT64 GetPos()const override;
@@ -48,7 +45,6 @@ namespace TBSKmodemCPP
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
     class AverageInterator;
     // """ シンボル幅がNのTBSK相関信号からビットを復調します。
@@ -78,7 +74,7 @@ namespace TBSKmodemCPP
         //         src
         //             TBSK信号の開始エッジにポインタのあるストリームをセットします。
         // """
-        TraitBlockDecoder& SetInput(shared_ptr<IRoStream<double>>&& src)override;
+        TraitBlockDecoder& SetInput(const shared_ptr<IRoStream<double>>&& src)override;
 
         int Next()override;
         // @property

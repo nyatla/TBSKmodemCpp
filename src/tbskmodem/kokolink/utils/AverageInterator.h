@@ -4,7 +4,7 @@
 #include <memory>
 namespace TBSKmodemCPP
 {
-    using namespace std;
+
     class AverageInterator :public SumIterator
     {
     private:

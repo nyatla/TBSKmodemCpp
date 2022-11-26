@@ -5,7 +5,6 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 
 #pragma warning( disable : 4250 )

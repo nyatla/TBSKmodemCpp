@@ -4,7 +4,6 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
     // """ 任意範囲のログを取りながら返すイテレータ
     //     このイテレータはRecoverableStopInterationを利用できます。
     // """

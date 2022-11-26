@@ -10,11 +10,13 @@
 #include "../../../utils/RingBuffer.h"
 #include "../../../utils/AsyncMethod.h"
 
-
+namespace TBSKmodemCPP
+{
+    using std::make_shared;
+}
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 #pragma warning( disable : 4250 )
 
@@ -65,8 +67,6 @@ namespace TBSKmodemCPP
 }
 namespace TBSKmodemCPP
 {
-    using namespace std;
-
 
     class ASwaitForSymbol : public AsyncMethod<NullableResult<TBSK_INT64>> {
     private:
@@ -79,7 +79,7 @@ namespace TBSKmodemCPP
         unique_ptr<AverageInterator> _avi;
         //AverageInterator _avi;
         int _cofbuf_len;
-        RingBuffer<double> _rb;
+        unique_ptr<RingBuffer<double>> _rb;
         double _gap;
         int _nor;
         double _pmax;
@@ -97,7 +97,7 @@ namespace TBSKmodemCPP
                 make_shared<SelfCorrcoefIterator>(this->_symbol_ticks, src, this->_symbol_ticks), this->_symbol_ticks * (6 + parent._cycle * 2), 0)
             },
             _avi{make_unique<AverageInterator>(this->_cof, this->_symbol_ticks)},
-            _rb{ RingBuffer<double>(this->_symbol_ticks * this->_sample_width, 0) },
+            _rb{make_unique<RingBuffer<double>>(this->_symbol_ticks * this->_sample_width, 0) },
             _result{ NullableResult<TBSK_INT64>() },
             _pmax{ 0 }
         {
@@ -148,7 +148,7 @@ namespace TBSKmodemCPP
             //# ローカル変数の生成
             auto avi = this->_avi.get();
             auto cof = this->_cof.get();
-            auto& rb = this->_rb;
+            auto rb = this->_rb.get();
             try
             {
                 while (true)
@@ -166,19 +166,19 @@ namespace TBSKmodemCPP
                         {
                             try
                             {
-                                rb.Append(avi->Next());
+                                rb->Append(avi->Next());
                                 //# print(rb.tail)
                                 this->_nor = this->_nor + 1;
-                                this->_gap = rb.GetTop() - rb.GetTail();
+                                this->_gap = rb->GetTop() - rb->GetTail();
                                 if (this->_gap < 0.5)
                                 {
                                     continue;
                                 }
-                                if (rb.GetTop() < 0.1)
+                                if (rb->GetTop() < 0.1)
                                 {
                                     continue;
                                 }
-                                if (rb.GetTail() > -0.1)
+                                if (rb->GetTail() > -0.1)
                                 {
                                     continue;
                                 }
@@ -199,9 +199,9 @@ namespace TBSKmodemCPP
                         {
                             try
                             {
-                                rb.Append(avi->Next());
+                                rb->Append(avi->Next());
                                 this->_nor = this->_nor + 1;
-                                auto w = rb.GetTop() - rb.GetTail();
+                                auto w = rb->GetTop() - rb->GetTail();
                                 if (w >= this->_gap)
                                 {
                                     //# print(w,self._gap)
@@ -223,7 +223,7 @@ namespace TBSKmodemCPP
                         }
                         //# print(3,nor,rb.tail,rb.top,self._gap)
                         //# print(2,nor,self._gap)
-                        this->_pmax = rb.GetTail();
+                        this->_pmax = rb->GetTail();
                         this->_co_step = 3;
                     }
                     if (this->_co_step == 3)
@@ -359,7 +359,7 @@ namespace TBSKmodemCPP
         // # return enc.setInput(BitStream([0,1]+[1,1]+[1]+[0,1]+[0,0,1],1))
         // # return enc.setInput(BitStream([0,1,1,1,1,0,1,0,0,1],1))
     }
-    NullableResult<TBSK_INT64> CoffPreamble::WaitForSymbol(shared_ptr<IRoStream<double>>&& src)
+    NullableResult<TBSK_INT64> CoffPreamble::WaitForSymbol(const shared_ptr<IRoStream<double>>&& src)
     {
         TBSK_ASSERT(!this->_asmethtod_lock);
         auto asmethtod = make_shared<ASwaitForSymbol>(*this, move(src));

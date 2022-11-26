@@ -5,7 +5,6 @@
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
     // """ ストリームの読み出し位置から過去N個の合計を返すイテレータです。
     //     このイテレータはRecoverableStopInterationを利用できます。
     // """
@@ -14,7 +13,7 @@ namespace TBSKmodemCPP
     private:
         const shared_ptr<IPyIterator<double>> _src;
         double _sum;
-        RingBuffer<double> _buf;
+        const unique_ptr<RingBuffer<double>> _buf;
 
         // def __init__(self,src:Iterator[T],length:int):
         //     self._src=src

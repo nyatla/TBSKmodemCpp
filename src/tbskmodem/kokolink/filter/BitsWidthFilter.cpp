@@ -1,7 +1,6 @@
 #include "BitsWidthFilter.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
     // """ 任意ビット幅のintストリームを任意ビット幅のint値にエンコードします。
     // """
     BitsWidthFilter::BitsWidthFilter(int input_bits, int output_bits) :BasicRoStream(),
@@ -14,10 +13,10 @@ namespace TBSKmodemCPP
     BitsWidthFilter::~BitsWidthFilter() {
     }
 
-    BitsWidthFilter& BitsWidthFilter::SetInput(shared_ptr<IRoStream<int>>&& src)
+    BitsWidthFilter& BitsWidthFilter::SetInput(const shared_ptr<IRoStream<int>>&& src)
     {
         this->_pos = 0;
-        this->_iter = move(make_unique<BitsWidthConvertIterator>(move(src), this->_input_bits, this->_output_bits));
+        this->_iter = move(make_unique<BitsWidthConvertIterator>(src, this->_input_bits, this->_output_bits));
         return *this;
     }
     int BitsWidthFilter::Next()

@@ -8,7 +8,7 @@ namespace TBSKmodemCPP
     //    run関数は処理が完了するまでの間falseを返します。trueを返すと、resultメソッドが有効になります。
     //    close関数はrunの処理を中断し、確保しているリソースを解放可能にします。
     //"""
-    template <typename T> class AsyncMethod
+    template <typename T> class AsyncMethod :public NoneCopyConstructor_class
     {
     public:
         AsyncMethod()

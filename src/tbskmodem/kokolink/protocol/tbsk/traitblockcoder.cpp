@@ -3,7 +3,10 @@
 #include "../../utils/AverageInterator.h"
 
 
-
+namespace TBSKmodemCPP
+{
+    using std::make_shared;
+}
 
 namespace TBSKmodemCPP
 {
@@ -24,7 +27,7 @@ namespace TBSKmodemCPP
     TraitBlockEncoder::~TraitBlockEncoder() {
 
     }
-    TraitBlockEncoder& TraitBlockEncoder::SetInput(shared_ptr<IBitStream>&& src)
+    TraitBlockEncoder& TraitBlockEncoder::SetInput(const shared_ptr<IBitStream>&& src)
     {
         this->_is_eos = false;//True if src is None else False
         //this->_tone_q->Clear();//=new Queue<float>();
@@ -69,7 +72,6 @@ namespace TBSKmodemCPP
 
 namespace TBSKmodemCPP
 {
-    using namespace std;
     // """ シンボル幅がNのTBSK相関信号からビットを復調します。
 
     // """
@@ -89,7 +91,7 @@ namespace TBSKmodemCPP
         //         src
         //             TBSK信号の開始エッジにポインタのあるストリームをセットします。
         // """
-    TraitBlockDecoder& TraitBlockDecoder::SetInput(shared_ptr<IRoStream<double>>&& src)
+    TraitBlockDecoder& TraitBlockDecoder::SetInput(const shared_ptr<IRoStream<double>>&& src)
     {
         this->_is_eos = false;
         auto cof = make_shared<SelfCorrcoefIterator>(this->_trait_block_ticks, src, this->_trait_block_ticks);

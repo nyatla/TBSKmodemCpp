@@ -1,7 +1,6 @@
 #include "BufferedIterator.h"
 namespace TBSKmodemCPP
 {
-    using namespace std;
 
 
     template <typename T> BufferedIterator<T> ::BufferedIterator(shared_ptr<IPyIterator<T>>&& src, int size, const T pad) :
