@@ -7,7 +7,7 @@
 
 namespace TBSKmodemCPP
 {
-    class TraitTone :public vector<double> {
+    class TraitTone :public vector<double> ,public NoneCopyConstructor_class{
     public:
         TraitTone();
         // """ 信号強度をv倍します。

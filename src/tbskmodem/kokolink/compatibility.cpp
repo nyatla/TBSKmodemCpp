@@ -1,18 +1,10 @@
 #include "compatibility.h"
-#include "types/Py__class__.h"
 #include <algorithm>
 #include <memory>
+#include <fstream>
 
-namespace TBSKmodemCPP
-{
-    using std::make_shared;
-}
 
-namespace TBSKmodemCPP
-{
-    NoneCopyConstructor_class::NoneCopyConstructor_class() {};
-    NoneCopyConstructor_class::~NoneCopyConstructor_class() {};
-}
+
 
 
 
@@ -21,22 +13,6 @@ namespace TBSKmodemCPP
 
 namespace TBSKmodemCPP
 {
-    template <typename T> T vector_sum(const std::vector<T>& src, int idx, int len) {
-        T w = 0;
-        for (int i = 0;i < len;i++) {
-            w = w + src.at((size_t)idx + i);
-        }
-        return w;
-    }
-    template <typename T> T vector_sort(std::vector<T>& src, bool reverse)
-    {
-        if (!reverse) {
-            std::sort(src.begin(), src.end());
-        }
-        else {
-            std::sort(src.begin(), src.end(), [](T a, T b) {return a > b;});
-        }
-    }
 
 }
 
@@ -96,44 +72,6 @@ namespace TBSKmodemCPP
 {
 
 
-    template <typename T> class PtrWrapperCU :public VectorWrapper<T>
-    {
-    private:
-        const unique_ptr<const vector<T>>& _src;
-    public:
-        PtrWrapperCU(const unique_ptr< const vector<T>>& src) :_src{ src }, VectorWrapper<T>(src.get()) {}
-    };
-    template <typename T> class PtrWrapperCS:public VectorWrapper<T>
-    {
-    private:
-        shared_ptr<const vector<T>> _src;
-    public:
-        PtrWrapperCS(const shared_ptr<const vector<T>>& src) :_src{ src }, VectorWrapper<T>(src.get()) {}
-    };
-
-
-
-    template <typename T> PyIterator<T>::PyIterator(const unique_ptr<const vector<T>>&& src) :_src{ make_unique<PtrWrapperCU<T>>(src) }
-    {}
-    template <typename T> PyIterator<T>::PyIterator(const shared_ptr<const vector<T>>&& src) :_src{ make_unique<PtrWrapperCS<T>>(src) } {}
-    template <typename T> PyIterator<T>::PyIterator(const vector<T>& src) :_src{ make_unique<VectorWrapper<T>>(&src) }
-    {
-    }
-    template <typename T> T PyIterator<T>::Next()
-    {
-        if (this->_ptr >= this->_src->_buf->size()) {
-            throw PyStopIteration();
-        }
-        auto r = this->_src->_buf->at(this->_ptr);
-        this->_ptr++;
-        return r;
-    }
-
-
-    
-    template class PyIterator<double>;
-    template class PyIterator<TBSK_BYTE>;
-    
 
 
 

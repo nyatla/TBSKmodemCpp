@@ -13,52 +13,99 @@ namespace TBSKmodemCPP
     {
     private:
         vector<T> _buf;
-
-
         int _p;
-
-
-        //static T* _genIEnumerable(int length, T pad)
-        //{
-        //    auto r = new T[length];
-        //    for (auto i = 0;i < length;i++) {
-        //        *(r + i) = pad;
-        //    }
-        //    return r;
-        //};
     public:
-        RingBuffer(size_t length, const T pad);
-        virtual ~RingBuffer();
-        T Append(T v);
-        void Extend(const T* buf, int len);
-        /** リストの一部を切り取って返します。
-            この関数はバッファの再配置を行いません。
-            C++拡張仕様 戻り値は解放して。
-        */
-        const unique_ptr<vector<T>> Sublist(int pos, int size)const;
-        // @property
-        // def tail(self)->T:
-        //     """ バッファの末尾 もっとも新しい要素"""
-        //     length=len(self._buf)
-        //     return self._buf[(self._p-1+length)%length]
-        T& GetTail()const;
-        // @property
-        // def top(self)->T:
-        //     """ バッファの先頭 最も古い要素"""
-        //     return self._buf[self._p]
-        T& GetTop()const;
-        // def __getitem__(self,s)->List[T]:
-        //     """ 通常のリストにして返します。
-        //         必要に応じて再配置します。再配置せずに取り出す場合はsublistを使用します。
-        //     """
-        //     b=self._buf
-        //     if self._p!=0:
-        //         self._buf= b[self._p:]+b[:self._p]
-        //     self._p=0
-        //     return self._buf[s]
-        T operator[](int s);
-        // def __len__(self)->int:
-        //     return len(self._buf)
-        int GetLength()const;
+        RingBuffer(size_t length, const T pad) :
+            _buf{ vector<T>() }
+        {
+            for (int i = 0;i < length;i++) {
+                this->_buf.push_back(pad);
+            }
+            this->_p = 0;
+        }
+        ~RingBuffer() {
+        }
+    public:
+
+        T Append(T v) {
+            auto& b = this->_buf;
+            const auto length = b.size();
+            auto ret = b[this->_p];
+            b[this->_p] = v;
+            this->_p = (this->_p + 1) % length;
+            return ret;
+
+        }
+        void Extend(const T* buf, int len) {
+            for (int i = 0;i < len;i++) {
+                this->Append(*(buf + i));
+            }
+        }
+        ///** リストの一部を切り取って返します。
+        //    この関数はバッファの再配置を行いません。
+        //*/    
+        const unique_ptr<vector<T>> Sublist(int pos, int size)const
+        {
+            auto& buf = this->_buf;
+            const auto l = this->_buf.size();
+            if (pos >= 0) {
+                const auto p = this->_p + pos;
+                if (size >= 0) {
+                    TBSK_ASSERT(pos + size <= l);
+                    auto ret = make_unique<vector<T>>(size);
+                    auto ret_ptr = ret.get();
+                    
+                    for (auto i = 0;i < size;i++) {
+                        ret_ptr->at(i) = buf[(p + i) % l];
+                    }
+                    return ret;
+                }
+                else {
+                    TBSK_ASSERT(pos + size + 1 >= 0);
+                    auto ret = make_unique<vector<T>>(-size);
+                    auto ret_ptr = ret.get();
+                    // return tuple([self._buf[(p+size+i+1)%l] for i in range(-size)])
+                    for (auto i = 0;i < -size;i++) {
+                        ret_ptr->at(i) = buf[(p + size + i + 1) % l];
+                    }
+                    return ret;
+                }
+            }
+            else {
+                auto p = this->_p + l + pos;
+                if (size >= 0) {
+                    TBSK_ASSERT(l + pos + size <= l);
+                    // return tuple([self._buf[(p+i)%l] for i in range(size)])
+                    auto ret = make_unique<vector<T>>(size);
+                    auto ret_ptr = ret.get();
+                    for (auto i = 0;i < size;i++) {
+                        ret_ptr->at(i) = buf[(p + i) % l];
+                    }
+                    return ret;
+                }
+                else {
+                    TBSK_ASSERT(l + pos + size + 1 >= 0);
+                    // return tuple([self._buf[(p-i+l)%l] for i in range(-size)])
+                    auto ret = make_unique<vector<T>>(size);
+                    auto ret_ptr = ret.get();
+                    for (auto i = 0;i < -size;i++) {
+                        ret_ptr->at(i) = buf[(p - i + l) % l];
+                    }
+                    return ret;
+                }
+            }
+        }
+        T GetTail()const {
+            auto length = this->_buf.size();
+            return this->_buf[(this->_p - 1 + length) % length];
+
+        }
+        T GetTop()const {
+            return this->_buf[this->_p];
+        }
+        size_t GetLength()const {
+            return this->_buf.size();
+        }
+
     };
 }

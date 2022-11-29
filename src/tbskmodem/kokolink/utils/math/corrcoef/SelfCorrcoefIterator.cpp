@@ -33,7 +33,6 @@ namespace TBSKmodemCPP
         this->sumyi = 0;
         this->sumyi2 = 0;
         this->sumxiyi = 0;
-        //this->_srcy = new queue<double>();
         // """初期化
         // """
         this->fill_c = 0;
@@ -65,6 +64,7 @@ namespace TBSKmodemCPP
 
         this->_srcy.push(vx);
         auto vy = this->_srcy.front();
+        this->_srcy.pop();
 
         if (this->fill_c<this->xyi_len)
         {

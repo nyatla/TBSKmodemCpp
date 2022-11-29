@@ -1,7 +1,10 @@
 #include "toneblock.h"
 #include <math.h>
 
-
+namespace TBSKmodemCPP
+{
+    using std::make_unique;
+}
 
 namespace TBSKmodemCPP
 {

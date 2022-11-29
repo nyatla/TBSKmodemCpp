@@ -1,14 +1,13 @@
 #include "./CoffPreamble.h"
+#include "../traitblockcoder.h"
 #include "../../../utils/AsyncMethod.h"
 #include "../../../interfaces.h"
 #include "../../../streams/BitStream.h"
-#include "../traitblockcoder.h"
 #include "../../../compatibility.h"
 #include "../../../utils/recoverable.h"
 #include "../../../utils/AverageInterator.h"
 #include "../../../utils/BufferedIterator.h"
 #include "../../../utils/RingBuffer.h"
-#include "../../../utils/AsyncMethod.h"
 
 namespace TBSKmodemCPP
 {
@@ -261,13 +260,13 @@ namespace TBSKmodemCPP
                         //# #ピーク周辺の読出し
                         //# [next(cof) for _ in range(symbol_ticks//4)]
                         //# バッファリングしておいた相関値に3値平均フィルタ
-                        auto& buf_s = cof->GetBuf().Sublist(cof->GetBuf().GetLength() - symbol_ticks, symbol_ticks);//buf = cof.buf[-symbol_ticks:]
+                        auto& buf_s = cof->GetBuf().Sublist((int)(cof->GetBuf().GetLength() - symbol_ticks), symbol_ticks);//buf = cof.buf[-symbol_ticks:]
                         auto buf = buf_s.get();
                         //var b =[(i + self._nor - symbol_ticks + 1, buf[i] + buf[i + 1] + buf[2]) for i in range(len(buf) - 2)];// #位置,相関値
                         struct TPcTuple {
                             int pos;
                             double cof;
-                            bool operator<(const TPcTuple& right) const {
+                            bool operator<(const struct TPcTuple& right) const {
                                 return cof <= right.cof;
                             }
                         };
@@ -362,7 +361,7 @@ namespace TBSKmodemCPP
     NullableResult<TBSK_INT64> CoffPreamble::WaitForSymbol(const shared_ptr<IRoStream<double>>&& src)
     {
         TBSK_ASSERT(!this->_asmethtod_lock);
-        auto asmethtod = make_shared<ASwaitForSymbol>(*this, move(src));
+        auto asmethtod = make_shared<ASwaitForSymbol>(*this, src);
         if (asmethtod->Run())
         {
             return asmethtod->GetResult();
@@ -371,7 +370,7 @@ namespace TBSKmodemCPP
         {
             //# ロックする（解放はASwaitForSymbolのclose内で。）
             this->_asmethtod_lock = true;
-            throw RecoverableException<ASwaitForSymbol>(asmethtod);
+            throw RecoverableException<NullableResult<TBSK_INT64>>(asmethtod);
         }
     }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "recoverable.h"
+#include "../NoneCopyConstructor_class.h"
 
 namespace TBSKmodemCPP
 {

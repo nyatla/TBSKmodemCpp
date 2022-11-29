@@ -1,14 +1,21 @@
 
 #pragma once
 #include "./Py__interface__.h"
-#include "../compatibility.h"
+#include "../NoneCopyConstructor_class.h"
 #include <exception>
 #include <vector>
 #include <memory>
+#include <queue>
 
 namespace TBSKmodemCPP
 {
     using std::exception;
+    using std::shared_ptr;
+    using std::unique_ptr;
+    using std::vector;
+    using std::make_shared;
+    using std::make_unique;
+    using std::move;
 }
 
 
@@ -22,6 +29,60 @@ namespace TBSKmodemCPP
     };
 }
 
+namespace TBSKmodemCPP
+{
+
+    template <typename T> class PyIterator :public NoneCopyConstructor_class, public virtual IPyIterator<T>
+    {
+    private:
+        template <typename T> class VectorWrapper :public NoneCopyConstructor_class
+        {
+        public:
+            const vector<T>* _buf;
+        public:
+            VectorWrapper(const vector<T>* src) :_buf{ src } {}
+        };
+        template <typename T> class PtrWrapperCU :public VectorWrapper<T>
+        {
+        private:
+            const unique_ptr<const vector<T>>& _src;
+        public:
+            PtrWrapperCU(const unique_ptr< const vector<T>>& src) :_src{ src }, VectorWrapper<T>(src.get()) {}
+        };
+        template <typename T> class PtrWrapperCS :public VectorWrapper<T>
+        {
+        private:
+            shared_ptr<const vector<T>> _src;
+        public:
+            PtrWrapperCS(const shared_ptr<const vector<T>>& src) :_src{ src }, VectorWrapper<T>(src.get()) {}
+        };
+
+    private:
+        size_t _ptr = 0;
+        const unique_ptr<VectorWrapper<T>> _src;
+    public:
+        PyIterator(const vector<T>* src);
+        PyIterator(const unique_ptr<const vector<T>>&& src);//参照
+        PyIterator(const shared_ptr<const vector<T>>&& src);//共有
+        PyIterator(const vector<T>& src);//参照
+        T Next()override;
+    };
+
+    template <typename T> PyIterator<T>::PyIterator(const unique_ptr<const vector<T>>&& src) :_src{ make_unique<PtrWrapperCU<T>>(src) } {}
+    template <typename T> PyIterator<T>::PyIterator(const shared_ptr<const vector<T>>&& src) : _src{ make_unique<PtrWrapperCS<T>>(src) } {}
+    template <typename T> PyIterator<T>::PyIterator(const vector<T>& src) : _src{ make_unique<VectorWrapper<T>>(&src) }
+    {
+    }
+    template <typename T> T PyIterator<T>::Next()
+    {
+        if (this->_ptr >= this->_src->_buf->size()) {
+            throw PyStopIteration();
+        }
+        auto r = this->_src->_buf->at(this->_ptr);
+        this->_ptr++;
+        return r;
+    }
+}
 
 
 namespace TBSKmodemCPP
@@ -30,15 +91,49 @@ namespace TBSKmodemCPP
     template <typename T> class IterChain : public NoneCopyConstructor_class,public virtual IPyIterator<T>
     {
     private:
-        shared_ptr<vector<shared_ptr<IPyIterator<T>>>> _src;
+        std::deque<shared_ptr<IPyIterator<T>>> _src;
         //IPyIterator<IPyIterator<T>*>* _src;
         // IPyIterator<T>? _current;
-        IPyIterator<T>* _current;
+        shared_ptr<IPyIterator<T>> _current;
     public:
-        IterChain(const shared_ptr<vector<shared_ptr<IPyIterator<T>>>>& src);
-        virtual ~IterChain();
-        T Next()override;
+        IterChain(const vector<shared_ptr<IPyIterator<T>>>& src){
+            for (auto i = 0;i < src.size();i++) {
+                this->_src.push_back(src[i]);
+            }
+            this->_current.reset();
+        }
+        virtual ~IterChain() {};
+        T Next()override
+        {
+            while (true)
+            {
+                if (!this->_current)
+                {
+                    if (!this->_src.empty()) {
+                        this->_current = this->_src.front();
+                        this->_src.pop_front();
+                    }
+                    else {
+                        throw PyStopIteration();
+                    }
+                }
+                try
+                {
+                    return this->_current->Next();
+                }
+                catch (PyStopIteration)
+                {   //値取得で失敗したらイテレーションの差し替え。
+                    this->_current.reset();
+                    continue;
+                }
+
+            }
+
+        }
     };
+
+
+
 }
 
 namespace TBSKmodemCPP
@@ -50,11 +145,24 @@ namespace TBSKmodemCPP
         T _v;
         int _count;
     public:
-        Repeater(T v, int count);
+        Repeater(T v, int count)
+        {
+            this->_v = v;
+            this->_count = count;
+        };
     public:
-        T Next() override;
+        T Next()override
+        {
+            if (this->_count == 0)
+            {
+                throw PyStopIteration();
+            }
+            this->_count--;
+            return this->_v;
+        }
     };
 }
+
 
 namespace TBSKmodemCPP
 {

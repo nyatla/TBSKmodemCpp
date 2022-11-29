@@ -59,6 +59,7 @@ namespace TBSKmodemCPP
             }
         }
         auto r = this->_tone_q.front();
+        this->_tone_q.pop();
         this->_pos += 1; //#posのインクリメント
         return r;
     }

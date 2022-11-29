@@ -1,36 +1,44 @@
 #pragma once
 #include "./interfaces.h"
-#include <vector>
-#include <iterator>
-#include <memory>
-#include <fstream>
-#include <iostream>
+#include "./NoneCopyConstructor_class.h"
+#include "types/Py__class__.h"
+#include <algorithm>
+
 
 namespace TBSKmodemCPP
 {
-    class NoneCopyConstructor_class
-    {
-    public:
-        NoneCopyConstructor_class();
-        virtual ~NoneCopyConstructor_class();
-    public:
-        // コピー禁止 (C++11)
-        NoneCopyConstructor_class(const NoneCopyConstructor_class&) = delete;
-        NoneCopyConstructor_class& operator=(const NoneCopyConstructor_class&) = delete;
-    };
+    using std::make_shared;
+    using std::make_unique;
+    using std::move;
+    using std::vector;
 }
 
 
+
 namespace TBSKmodemCPP
 {
-
-    template <typename T> T vector_sum(const std::vector<T>& src, int idx, int len);
-    template <typename T> T vector_sum(const std::vector<T>* src, int idx, int len) {
+    template <typename T> T vector_sum(const vector<T>& src, int idx, int len) {
+        T w = 0;
+        for (int i = 0;i < len;i++) {
+            w = w + src.at((size_t)idx + i);
+        }
+        return w;
+    }
+    template <typename T> T vector_sum(const vector<T>* src, int idx, int len) {
         return vector_sum(*src, idx, len);
     }
-    template <typename T> void vector_sort(std::vector<T>& src, bool reverse = false);
-    template <typename T> void vector_sort(std::vector<T>* src, bool reverse = false) {
-        return vector_sort(*src, reverse);
+
+    template <typename T> void vector_sort(vector<T>& src, bool reverse=false)
+    {
+        if (!reverse) {
+            std::sort(src.begin(), src.end());
+        }
+        else {
+            std::sort(src.begin(), src.end());
+        }
+    }
+    template <typename T> void vector_sort(vector<T>* src, bool reverse = false) {
+        vector_sort(*src, reverse);
     }
 }
 
@@ -88,27 +96,11 @@ namespace TBSKmodemCPP
 
 namespace TBSKmodemCPP
 {
-    template <typename T> class VectorWrapper :public NoneCopyConstructor_class
-    {
-    public:
-        const vector<T>* _buf;
-    public:
-        VectorWrapper(const vector<T>* src) :_buf{ src } {}
-    };
 
 
-    template <typename T> class PyIterator :public NoneCopyConstructor_class, public virtual IPyIterator<T>
-    {
-    private:
-        size_t _ptr = 0;
-        const unique_ptr<VectorWrapper<T>> _src;
-    public:
-        //PyIterator(const vector<T>* src);
-        PyIterator(const unique_ptr<const vector<T>>&& src);//参照
-        PyIterator(const shared_ptr<const vector<T>>&& src);//共有
-        PyIterator(const vector<T>& src);//参照
-        T Next()override;
-    };
+
+
+
 
 }
     
