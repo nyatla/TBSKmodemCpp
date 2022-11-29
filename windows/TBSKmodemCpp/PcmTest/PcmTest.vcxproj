@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1357bfea-ec4d-4dd5-bbcb-453be18e2632}</ProjectGuid>
-    <RootNamespace>libTbskModem</RootNamespace>
+    <ProjectGuid>{a5f251a7-1a19-48a7-a750-08cc48c2f0bd}</ProjectGuid>
+    <RootNamespace>PcmTest</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -104,7 +104,6 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -129,61 +128,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\compatibility.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2BytesFilter.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2StrFilter.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\BitsWidthFilter.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\NoneCopyConstructor_class.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\preamble\CoffPreamble.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\tbskmodem.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\toneblock.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\traitblockcoder.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\BitStream.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\ByteStream.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\bytestreams.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\RoStream.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\rostreams.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__class__.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__interface__.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\types.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BufferedIterator.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\recoverable.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\RingBuffer.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\riffio.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem.h" />
+    <ClCompile Include="PcmTest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\compatibility.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2BytesFilter.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2StrFilter.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\BitsWidthFilter.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\interfaces.h" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\preamble\CoffPreamble.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\preamble\Preamble.h" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\tbskmodem.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\toneblock.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\traitblockcoder.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\streams\BitStream.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\streams\ByteStream.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\streams\bytestreams.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\types\Py__class__.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AsyncMethod.h" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\RingBuffer.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.cpp" />
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\riffio.cpp" />
+    <ProjectReference Include="..\libTbskModem\libTbskModem.vcxproj">
+      <Project>{1357bfea-ec4d-4dd5-bbcb-453be18e2632}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

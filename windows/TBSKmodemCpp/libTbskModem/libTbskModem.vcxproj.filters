@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="おソースファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="おソースファイル\types">
+      <UniqueIdentifier>{327de1ea-57dc-47f4-bfb6-d6df5eea1fad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\utils">
+      <UniqueIdentifier>{19bca7fb-f501-4755-af44-44045c82533f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\utils\math">
+      <UniqueIdentifier>{607e4644-9088-426e-933e-ab6e33dd0f7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\utils\math\corrcoef">
+      <UniqueIdentifier>{d83b0699-853e-4871-a160-9514d61e87f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\streams">
+      <UniqueIdentifier>{937357df-c301-4259-ac2e-67f50297f732}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\filter">
+      <UniqueIdentifier>{b9a536ef-a82b-4305-93de-8b60505a2eea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\tbsk">
+      <UniqueIdentifier>{ed61c51c-9d68-40c3-ae0a-ee067ea9108c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\tbsk\preamble">
+      <UniqueIdentifier>{fa3a3e1b-9cae-4711-abd5-a99a08214862}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="おソースファイル\utils\wavefile">
+      <UniqueIdentifier>{e50d48db-7d94-4a8b-ab76-07dbc85218c5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__class__.h">
+      <Filter>おソースファイル\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\types.h">
+      <Filter>おソースファイル\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\recoverable.h">
+      <Filter>おソースファイル\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BufferedIterator.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\RingBuffer.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.h">
+      <Filter>おソースファイル\utils\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.h">
+      <Filter>おソースファイル\utils\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.h">
+      <Filter>おソースファイル\utils\math\corrcoef</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\rostreams.h">
+      <Filter>おソースファイル\streams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\RoStream.h">
+      <Filter>おソースファイル\streams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\bytestreams.h">
+      <Filter>おソースファイル\streams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\ByteStream.h">
+      <Filter>おソースファイル\streams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\streams\BitStream.h">
+      <Filter>おソースファイル\streams</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\BitsWidthFilter.h">
+      <Filter>おソースファイル\filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2StrFilter.h">
+      <Filter>おソースファイル\filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2BytesFilter.h">
+      <Filter>おソースファイル\filter</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\toneblock.h">
+      <Filter>おソースファイル\tbsk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\traitblockcoder.h">
+      <Filter>おソースファイル\tbsk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\compatibility.h">
+      <Filter>おソースファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\preamble\CoffPreamble.h">
+      <Filter>おソースファイル\tbsk\preamble</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\riffio.h">
+      <Filter>おソースファイル\utils\wavefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.h">
+      <Filter>おソースファイル\utils\wavefile</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__interface__.h">
+      <Filter>おソースファイル\types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\tbskmodem.h">
+      <Filter>おソースファイル\tbsk</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\NoneCopyConstructor_class.h">
+      <Filter>おソースファイル</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\interfaces.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AsyncMethod.h">
+      <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\compatibility.cpp">
+      <Filter>おソースファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\preamble\Preamble.h">
+      <Filter>おソースファイル\tbsk\preamble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\preamble\CoffPreamble.cpp">
+      <Filter>おソースファイル\tbsk\preamble</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\streams\BitStream.cpp">
+      <Filter>おソースファイル\streams</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\traitblockcoder.cpp">
+      <Filter>おソースファイル\tbsk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.cpp">
+      <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\tbskmodem.cpp">
+      <Filter>おソースファイル\tbsk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\types\Py__class__.cpp">
+      <Filter>おソースファイル\types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\streams\ByteStream.cpp">
+      <Filter>おソースファイル\streams</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\BitsWidthFilter.cpp">
+      <Filter>おソースファイル\filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2StrFilter.cpp">
+      <Filter>おソースファイル\filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2BytesFilter.cpp">
+      <Filter>おソースファイル\filter</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\streams\bytestreams.cpp">
+      <Filter>おソースファイル\streams</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\toneblock.cpp">
+      <Filter>おソースファイル\tbsk</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.cpp">
+      <Filter>おソースファイル\utils\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.cpp">
+      <Filter>おソースファイル\utils\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\RingBuffer.cpp">
+      <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.cpp">
+      <Filter>おソースファイル\utils\math\corrcoef</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.cpp">
+      <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\riffio.cpp">
+      <Filter>おソースファイル\utils\wavefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.cpp">
+      <Filter>おソースファイル\utils\wavefile</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.cpp">
+      <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
