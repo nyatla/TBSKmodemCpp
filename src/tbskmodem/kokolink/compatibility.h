@@ -3,7 +3,7 @@
 #include "./NoneCopyConstructor_class.h"
 #include "types/Py__class__.h"
 #include <algorithm>
-
+#include <functional>
 
 namespace TBSKmodemCPP
 {
@@ -34,7 +34,7 @@ namespace TBSKmodemCPP
             std::sort(src.begin(), src.end());
         }
         else {
-            std::sort(src.begin(), src.end());
+            std::sort(src.begin(), src.end(), std::greater<T>());
         }
     }
     template <typename T> void vector_sort(vector<T>* src, bool reverse = false) {

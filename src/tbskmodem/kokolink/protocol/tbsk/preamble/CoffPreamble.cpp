@@ -270,6 +270,9 @@ namespace TBSKmodemCPP
                             bool operator<(const struct TPcTuple& right) const {
                                 return cof <= right.cof;
                             }
+                            bool operator>(const struct TPcTuple& right) const {
+                                return cof > right.cof;
+                            }
                         };
                         vector<struct TPcTuple> b(buf->size() - 2);
                         for (auto i = 0; i < buf->size() - 2; i++)
