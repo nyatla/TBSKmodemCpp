@@ -61,27 +61,26 @@ namespace TBSKmodemCPP
         size_t _ptr = 0;
         const unique_ptr<VectorWrapper<T>> _src;
     public:
-        PyIterator(const vector<T>* src);
-        PyIterator(const unique_ptr<const vector<T>>&& src);//参照
-        PyIterator(const shared_ptr<const vector<T>>&& src);//共有
-        PyIterator(const vector<T>& src);//参照
-        T Next()override;
+        PyIterator(const vector<T>* src) :
+            _src{ make_unique<VectorWrapper<T>>(src) } {}
+        PyIterator(const unique_ptr<const vector<T>>&& src) :
+            _src{make_unique<PtrWrapperCU<T>>(src) } {};//参照
+        PyIterator(const shared_ptr<const vector<T>>&& src) :
+            _src{ make_unique<PtrWrapperCS<T>>(src) } {};//共有
+        PyIterator(const vector<T>& src) :
+            _src{ make_unique<VectorWrapper<T>>(&src) } {};//参照
+        T Next()override
+        {
+            if (this->_ptr >= this->_src->_buf->size()) {
+                throw PyStopIteration();
+            }
+            auto r = this->_src->_buf->at(this->_ptr);
+            this->_ptr++;
+            return r;
+        }
     };
 
-    template <typename T> PyIterator<T>::PyIterator(const unique_ptr<const vector<T>>&& src) :_src{ make_unique<PtrWrapperCU<T>>(src) } {}
-    template <typename T> PyIterator<T>::PyIterator(const shared_ptr<const vector<T>>&& src) : _src{ make_unique<PtrWrapperCS<T>>(src) } {}
-    template <typename T> PyIterator<T>::PyIterator(const vector<T>& src) : _src{ make_unique<VectorWrapper<T>>(&src) }
-    {
-    }
-    template <typename T> T PyIterator<T>::Next()
-    {
-        if (this->_ptr >= this->_src->_buf->size()) {
-            throw PyStopIteration();
-        }
-        auto r = this->_src->_buf->at(this->_ptr);
-        this->_ptr++;
-        return r;
-    }
+
 }
 
 

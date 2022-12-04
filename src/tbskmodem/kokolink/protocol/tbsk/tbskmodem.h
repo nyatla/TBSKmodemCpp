@@ -40,12 +40,10 @@ namespace TBSKmodemCPP
         virtual ~TbskModulator();
     private:
     public:
-        unique_ptr<IPyIterator<double>> ModulateAsBit();
-
-        unique_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IRoStream<int>>&& src);
-        unique_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IPyIterator<int>>& src);
-        unique_ptr<IPyIterator<double>> Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8);
-        unique_ptr<IPyIterator<double>> Modulate(const char* src, int length = -1);
+        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IRoStream<int>>&& src);
+        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IPyIterator<int>>& src);
+        shared_ptr<IPyIterator<double>> Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8);
+        shared_ptr<IPyIterator<double>> Modulate(const char* src, int length = -1);
     };
 }
 
@@ -59,11 +57,10 @@ namespace TBSKmodemCPP
     private:
         friend AsyncDemodulateX<int>;
         friend AsyncDemodulateX<char>;//美しくない実装
-        const TraitTone& _tone;
-        Preamble& _pa_detector;
+        const shared_ptr<const TraitTone> _tone;
+        const shared_ptr<Preamble> _pa_detector;
         bool _asmethod_lock;
 
-        TbskDemodulator(const TraitTone& tone, Preamble& preamble);
 
 
 
@@ -72,10 +69,12 @@ namespace TBSKmodemCPP
     //    関数は信号を検知する迄制御を返しません。信号を検知せずにストリームが終了した場合はNoneを返します。
     //"""
     private:
-
+    public:
+        TbskDemodulator(const shared_ptr<TraitTone>& tone, const shared_ptr<Preamble>& preamble);
+        TbskDemodulator(const shared_ptr<TraitTone>& tone);
 
     public:
-        unique_ptr<IPyIterator<int>> DemodulateAsBit(const shared_ptr<IPyIterator<double>>& src);
+        shared_ptr<IPyIterator<int>> DemodulateAsBit(const shared_ptr<IPyIterator<double>>& src);
 
 
 
@@ -84,7 +83,7 @@ namespace TBSKmodemCPP
         //    """
         shared_ptr<IPyIterator<int>> DemodulateAsInt(const shared_ptr<IPyIterator<double>>& src, int bitwidth = 8);
 
-        unique_ptr<IPyIterator<char>> DemodulateAsChar(const shared_ptr<IPyIterator<double>>& src);
+        shared_ptr<IPyIterator<char>> DemodulateAsChar(const shared_ptr<IPyIterator<double>>& src);
 
     };
 

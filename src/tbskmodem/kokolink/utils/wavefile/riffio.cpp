@@ -340,23 +340,18 @@ namespace TBSKmodemCPP
         }
         return s;
     }
-    WaveFile::WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, size_t frames_len, const vector<shared_ptr<const Chunk>>& extchunks) :
-        RiffHeader(toSize(frames_len,&extchunks), "WAVE"), _chunks{ std::vector<shared_ptr<const Chunk>>() }
+    WaveFile::WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, size_t frames_len, const vector<shared_ptr<const Chunk>>* extchunks) :
+        RiffHeader(toSize(frames_len,extchunks), "WAVE"), _chunks{ std::vector<shared_ptr<const Chunk>>() }
     {
         this->_chunks.push_back(std::make_shared<FmtChunk>(samplerate, samplewidth, nchannel));
         this->_chunks.push_back(std::make_shared<DataChunk>(frames, frames_len));
-        //if (extchunks != NULL) {
-        for (auto i = 0;i < extchunks.size();i++) {
-            this->_chunks.push_back(extchunks.at(i));
+        if (extchunks != NULL) {
+            for (auto i = 0;i < extchunks->size();i++) {
+                this->_chunks.push_back(extchunks->at(i));
+            }
         }
     }
 
-    WaveFile::WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, std::size_t frames_len) :
-        RiffHeader(toSize(frames_len,NULL), "WAVE"), _chunks{vector<shared_ptr<const Chunk>>() }
-    {
-        this->_chunks.push_back(std::make_shared<FmtChunk>(samplerate, samplewidth, nchannel));
-        this->_chunks.push_back(std::make_shared<DataChunk>(frames, frames_len));
-    }
 
 
 

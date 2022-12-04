@@ -61,7 +61,7 @@ namespace TBSKmodemCPP
     // """ Sin波形をXPSK変調したトーン信号です。
     //     1Tick単位でshiftイテレータの返す値×2pi/divの値だけ位相をずらします。
     // """
-    class XPskSinTone :TraitTone {
+    class XPskSinTone :public TraitTone {
 
         // """
         //     Args:

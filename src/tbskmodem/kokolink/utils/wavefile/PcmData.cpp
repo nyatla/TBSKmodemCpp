@@ -7,11 +7,11 @@ namespace TBSKmodemCPP {
     using std::invalid_argument;
     using std::min;
     using std::max;
+
 }
 
 namespace TBSKmodemCPP
 {
-
     static unique_ptr<vector<TBSK_BYTE>> Float2bytes(IPyIterator<double>& fdata, int bits)
     {
         auto ret = make_unique<vector<TBSK_BYTE>>();
@@ -55,6 +55,14 @@ namespace TBSKmodemCPP
         }
         throw std::invalid_argument("Invalid bits");
     }
+    static unique_ptr<vector<TBSK_BYTE>> Float2bytes(const vector<double>& fdata, int bits) {
+        PyIterator<double> a(fdata);
+        return Float2bytes(a, bits);
+    }
+
+
+
+
     unique_ptr<const PcmData> PcmData::Load(IBinaryReader& fp)
     {
         return std::make_unique<const PcmData>(fp);
@@ -70,19 +78,19 @@ namespace TBSKmodemCPP
     PcmData::PcmData(IBinaryReader& fp) :_wavfile(make_unique<WaveFile>(fp)) {
     }
 
-    PcmData::PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>& chunks) :
+    PcmData::PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks) :
         _wavfile{make_unique<WaveFile>(frame_rate, sample_bits/8, 1, src, size, chunks) }
     {
         //TBSK_ASSERT((this->_frames.size()) % (this->_sample_bits / 8) == 0);//   #srcの境界チェック
     }
-    PcmData::PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>& chunks) :
+
+    PcmData::PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks) :
         _wavfile{make_unique<WaveFile>(frame_rate, sample_bits / 8, 1,*Float2bytes(src,sample_bits), chunks) }
     {
     }
-    PcmData::PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate) :
-        _wavfile{ make_unique<WaveFile>(frame_rate, sample_bits / 8,1,  src, size) }
+    PcmData::PcmData(const vector<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks) :
+        _wavfile{make_unique<WaveFile>(frame_rate, sample_bits / 8, 1,*Float2bytes(src,sample_bits), chunks) }
     {
-
     }
 
 

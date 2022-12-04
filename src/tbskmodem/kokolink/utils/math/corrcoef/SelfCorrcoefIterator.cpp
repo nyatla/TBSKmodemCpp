@@ -18,9 +18,11 @@ namespace TBSKmodemCPP
     // """
 
     SelfCorrcoefIterator::SelfCorrcoefIterator(int window, const shared_ptr<IPyIterator<double>>& src, int shift):
-        xyi_len{ window * 2 }, _srcx{src}
+        xyi_len{ window },
+        xyi{ make_unique<double[]>(this->xyi_len * 2) },
+        _srcx{ src }
+
     {
-        this->xyi = new double[this->xyi_len];//std::vector<double[]>(window);// Functions.Create2dArray<double?>(window,2,null); //#Xi
         //for (auto i = 0; i < window; i++)
         //{
         //    this->xyi[i] = NULL;
@@ -43,7 +45,6 @@ namespace TBSKmodemCPP
     }
     SelfCorrcoefIterator::~SelfCorrcoefIterator()
     {
-        TBSK_SAFE_DELETE(this->xyi);
     }
 
     double SelfCorrcoefIterator::Next()
@@ -128,6 +129,7 @@ namespace TBSKmodemCPP
         v = this->sumxiyi + this->n * meanx_ * meany_ - meany_ * sumxi - meanx_ * sumyi;
         auto covxy = v / (this->n - 1);
         auto r = stdx * stdy == 0 ? 0 : covxy / (stdx * stdy);
+
         return r > 1 ? 1.f : (r < -1 ? -1 : r);
     }
 

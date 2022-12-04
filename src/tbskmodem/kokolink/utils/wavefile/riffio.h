@@ -148,12 +148,11 @@ namespace TBSKmodemCPP
         WaveFile(IBinaryReader& fp);
         //
         // extchunksの内容はこのインスタンスに移譲する。
-        WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, size_t frames_len, const vector<shared_ptr<const Chunk>>& extchunks);
-        
-        WaveFile(int samplerate, int samplewidth, int nchannel, const vector<TBSK_BYTE>& frames, const vector<shared_ptr<const Chunk>>& extchunks) :
+        WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, size_t frames_len, const vector<shared_ptr<const Chunk>>* extchunks=NULL);
+
+        WaveFile(int samplerate, int samplewidth, int nchannel, const vector<TBSK_BYTE>& frames, const vector<shared_ptr<const Chunk>>* extchunks=NULL) :
             WaveFile(samplerate, samplewidth, nchannel, (const TBSK_BYTE*)frames.data(), frames.size(), extchunks) {}
 
-        WaveFile(int samplerate, int samplewidth, int nchannel, const TBSK_BYTE* frames, size_t frames_len);
         WaveFile(int samplerate, int samplewidth, int nchannel, const vector<TBSK_BYTE>& frames) :
             WaveFile(samplerate, samplewidth, nchannel, (const TBSK_BYTE*)frames.data(),frames.size()) {}
 

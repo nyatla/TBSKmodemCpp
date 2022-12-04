@@ -1,12 +1,12 @@
 #pragma once
-#include "../../types/types.h"
-#include "../../types/Py__class__.h"
 #include "./riffio.h"
-#include "../../compatibility.h"
 #include <vector>
 #include <memory>
 namespace TBSKmodemCPP
 {
+    using std::vector;
+    using std::shared_ptr;
+
     // """ wavファイルのラッパーです。1chモノラルpcmのみ対応します。
     // """
     class PcmData :public NoneCopyConstructor_class
@@ -21,12 +21,16 @@ namespace TBSKmodemCPP
         static unique_ptr<const PcmData> Load(IBinaryReader& fp);
         static void Dump(PcmData& src, IBinaryWriter& dest);
         PcmData(IBinaryReader& fp);
-        PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>& chunks);
-        PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate);
-        PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>& chunks);
-        PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate) :PcmData(src, sample_bits, frame_rate, vector<shared_ptr<const Chunk>>()) {};
+        PcmData(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks=NULL);
 
-        //PcmData(const vector<TBSK_BYTE>& src, int sample_bits, int frame_rate) :PcmData((const TBSK_BYTE*)(src.data()), src.size(), sample_bits, frame_rate) {};
+        PcmData(IPyIterator<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks=NULL);
+
+        PcmData(const vector<double>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks=NULL);
+
+        //PcmData(const shared_ptr<const vector<double>>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks) :
+        //    PcmData(*src.get(), sample_bits, frame_rate, chunks) {};
+        PcmData(const shared_ptr<const vector<double>>& src, int sample_bits, int frame_rate, const vector<shared_ptr<const Chunk>>* chunks=NULL) :
+            PcmData(*src.get(), sample_bits, frame_rate, chunks) {};
 
 
 

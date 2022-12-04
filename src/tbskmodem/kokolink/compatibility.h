@@ -94,26 +94,32 @@ namespace TBSKmodemCPP
 }
 
 
-namespace TBSKmodemCPP
-{
 
-
-
-
-
-
-}
     
 namespace TBSKmodemCPP
 {
 
     using std::make_unique;
+    using std::make_shared;
 
-    class Functions {
-    public:
-        //template <typename T> IPyIterator<T> ToPyIterator(shared_ptr<const vector<T>>&& src) {
-        //    return new PyIterator<T>>(src);
-        //}
+    namespace Functions {
+        template <typename T> shared_ptr<vector<T>> ToVector(IPyIterator<T>* src) {
+            auto r = make_shared<vector<T>>();
+            try {
+                for (;;) {
+                    r->push_back(src->Next());
+                }
+            }
+            catch(PyStopIteration) {
+                return r;
+            }
+            throw std::exception();
+        }
+        template <typename T> shared_ptr<vector<T>> ToVector(const shared_ptr<IPyIterator<T>>& src)
+        {
+            return ToVector(src.get());
+        }
+
         //template <typename T> IPyIterator < T ToPyIterator(shared_ptr<vector<T>>& src) {
         //    return make_unique<PyIterator<T>>(src);
         //}
@@ -130,7 +136,6 @@ namespace TBSKmodemCPP
 
 
 
-    public:
         //vctorを接続した新しいvectorを割り当てて返す。
         template <typename T> static vector<T>* Flatten(const std::vector<std::vector<T>>& s);
     };

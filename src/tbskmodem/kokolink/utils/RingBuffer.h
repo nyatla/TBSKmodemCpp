@@ -15,8 +15,7 @@ namespace TBSKmodemCPP
         vector<T> _buf;
         int _p;
     public:
-        RingBuffer(size_t length, const T pad) :
-            _buf{ vector<T>() }
+        RingBuffer(size_t length, const T pad)
         {
             for (int i = 0;i < length;i++) {
                 this->_buf.push_back(pad);

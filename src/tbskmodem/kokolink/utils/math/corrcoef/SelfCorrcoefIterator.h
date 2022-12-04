@@ -21,8 +21,8 @@ namespace TBSKmodemCPP
     class SelfCorrcoefIterator : public IRecoverableIterator<double>
     {
     private:
-        double* xyi;
         const int xyi_len;
+        const unique_ptr<double[]> xyi;
         //std::vector<double[]>* xyi;
         int c;
         int n;

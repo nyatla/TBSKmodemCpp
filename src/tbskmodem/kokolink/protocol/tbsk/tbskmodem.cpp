@@ -93,41 +93,27 @@ namespace TBSKmodemCPP
     }
     TbskModulator::~TbskModulator() {
     }
-    unique_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit()
+
+    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IRoStream<int>>&& src)
     {
-        //auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
+        auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
 
-        //auto tbe = make_shared<TraitBlockEncoder>(this->_tone);
-        //tbe->SetInput(make_shared<DiffBitEncoder>(0, src));
-        //vector <shared_ptr<IPyIterator<double>>> d{
-        //    this->_preamble->GetPreamble(),
-        //    tbe,
-        //    make_shared<Repeater<double>>(0, ave_window_shift)
-        //};
-        auto a= make_unique<Repeater<double>>(0, 3);
-        return a;
+        auto tbe = make_shared<TraitBlockEncoder>(this->_tone);
+        tbe->SetInput(make_shared<DiffBitEncoder>(0, src));
+        vector <shared_ptr<IPyIterator<double>>> d{
+            this->_preamble->GetPreamble(),
+            tbe,
+            make_shared<Repeater<double>>(0, ave_window_shift)
+        };
+        return make_shared<IterChain<double>>(d);
     }
-
-    unique_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IRoStream<int>>&& src)
-    {
-        //auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
-
-        //auto tbe = make_shared<TraitBlockEncoder>(this->_tone);
-        //tbe->SetInput(make_shared<DiffBitEncoder>(0, src));
-        //vector <shared_ptr<IPyIterator<double>>> d{
-        //    this->_preamble->GetPreamble(),
-        //    tbe,
-        //    make_shared<Repeater<double>>(0, ave_window_shift)
-        //};
-        return make_unique<Repeater<double>>(0, 3);//make_unique<IterChain<double>>(d);
-    }
-    unique_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IPyIterator<int>>& src)
+    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IPyIterator<int>>& src)
     {
         return this->ModulateAsBit(make_shared<RoStream<int>>(src));
     }
 
 
-    unique_ptr<IPyIterator<double>> TbskModulator::Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth)
+    shared_ptr<IPyIterator<double>> TbskModulator::Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth)
     {
         auto s = make_shared<BitsWidthFilter>(bitwidth);
         s->SetInput(make_shared<RoStream<int>>(src));
@@ -135,7 +121,7 @@ namespace TBSKmodemCPP
     }
 
 
-    unique_ptr<IPyIterator<double>> TbskModulator::Modulate(const char* src, int length)
+    shared_ptr<IPyIterator<double>> TbskModulator::Modulate(const char* src, int length)
     {
         if (length < 0) {
             length = (int)strnlen_s(src, (size_t)16 * 1024);
@@ -146,13 +132,12 @@ namespace TBSKmodemCPP
         }
         return this->Modulate(make_shared<PyIterator<int>>(d), 8);
     }
-
 }
 
 namespace TBSKmodemCPP
 {
 #pragma warning( disable : 4250 )
-    template <typename T> class AsyncDemodulateX : public AsyncMethod<unique_ptr<IPyIterator<T>>>
+    template <typename T> class AsyncDemodulateX : public AsyncMethod<shared_ptr<IPyIterator<T>>>
     {
     private:
         TbskDemodulator& _parent;
@@ -161,14 +146,14 @@ namespace TBSKmodemCPP
         bool _closed;
         NullableResult<TBSK_INT64> _peak_offset;
         int _co_step;
-        unique_ptr<IPyIterator<T>> _result;
+        shared_ptr<IPyIterator<T>> _result;
         shared_ptr<AsyncMethod<NullableResult<TBSK_INT64>>> _wsrex;
     protected:
-        virtual unique_ptr<IPyIterator<T>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const = 0;
+        virtual shared_ptr<IPyIterator<T>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const = 0;
     public:
-        AsyncDemodulateX(TbskDemodulator& parent, const shared_ptr<IPyIterator<double>>& src) : AsyncMethod<unique_ptr<IPyIterator<T>>>(),
+        AsyncDemodulateX(TbskDemodulator& parent, const shared_ptr<IPyIterator<double>>& src) : AsyncMethod<shared_ptr<IPyIterator<T>>>(),
             _parent{ parent },
-            _tone_ticks{ (int)parent._tone.size() },
+            _tone_ticks{ (int)parent._tone->size() },
             _stream{ make_shared<RoStream<double>>(src) },
             _peak_offset{ NullableResult<TBSK_INT64>() }
         {
@@ -180,11 +165,10 @@ namespace TBSKmodemCPP
         virtual ~AsyncDemodulateX() {
             this->Close();
         }
-        unique_ptr<IPyIterator<T>> GetResult() override
+        shared_ptr<IPyIterator<T>> GetResult() override
         {   //コピー不能値なのでここでは取り外す。
             TBSK_ASSERT(this->_co_step >= 4);
-            auto a = move(this->_result);
-            return a;
+            return this->_result;
 
         }
         void Close()
@@ -208,7 +192,7 @@ namespace TBSKmodemCPP
             {
                 try
                 {
-                    this->_peak_offset = this->_parent._pa_detector.WaitForSymbol(this->_stream); //#現在地から同期ポイントまでの相対位置
+                    this->_peak_offset = this->_parent._pa_detector->WaitForSymbol(this->_stream); //#現在地から同期ポイントまでの相対位置
                     TBSK_ASSERT(this->_wsrex == NULL);
                     this->_co_step = 2;
                 }
@@ -283,7 +267,14 @@ namespace TBSKmodemCPP
 }
 namespace TBSKmodemCPP
 {
-    TbskDemodulator::TbskDemodulator(const TraitTone& tone, Preamble& preamble) :
+    TbskDemodulator::TbskDemodulator(const shared_ptr<TraitTone>& tone) :
+        _pa_detector{ make_shared<CoffPreamble>(tone) },
+        _tone{ tone }
+    {
+        this->_asmethod_lock = false;
+    }
+
+    TbskDemodulator::TbskDemodulator(const shared_ptr<TraitTone>& tone, const shared_ptr<Preamble>& preamble) :
         _pa_detector{ preamble },
         _tone{ tone }
     {
@@ -291,14 +282,14 @@ namespace TBSKmodemCPP
     }
 
 
-    unique_ptr<IPyIterator<int>> TbskDemodulator::DemodulateAsBit(const shared_ptr<IPyIterator<double>>& src)
+    shared_ptr<IPyIterator<int>> TbskDemodulator::DemodulateAsBit(const shared_ptr<IPyIterator<double>>& src)
     {
         TBSK_ASSERT(!this->_asmethod_lock);
         class Asdem :public AsyncDemodulateX<int> {
         public:
             Asdem(TbskDemodulator& parent,const shared_ptr<IPyIterator<double>>& src):AsyncDemodulateX<int>(parent,src) {}
         protected:
-            unique_ptr<IPyIterator<int>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const
+            shared_ptr<IPyIterator<int>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const
             {
                 class IterWrapper :public virtual IPyIterator<int>
                 {
@@ -310,7 +301,7 @@ namespace TBSKmodemCPP
                     IterWrapper(const shared_ptr<IPyIterator<int>>& src) :_src{ src }, _ptr{src.get()} {};
                     int Next()override { return this->_ptr->Next(); };
                 };
-                return make_unique<IterWrapper>(src);
+                return make_shared<IterWrapper>(src);
             };
         };
         auto asmethod = make_shared<Asdem>(*this, src);
@@ -322,7 +313,7 @@ namespace TBSKmodemCPP
         else
         {
             this->_asmethod_lock = true;// #解放はAsyncDemodulateXのcloseで
-            throw RecoverableException<unique_ptr<IPyIterator<int>>>(asmethod);
+            throw RecoverableException<shared_ptr<IPyIterator<int>>>(asmethod);
         }
     }
 
@@ -340,9 +331,9 @@ namespace TBSKmodemCPP
         public:
             Asdem(TbskDemodulator& parent,const shared_ptr<IPyIterator<double>>& src,int bitwidth) :AsyncDemodulateX<int>(parent, src),_bitwidth(bitwidth) {}
         protected:
-            unique_ptr<IPyIterator<int>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const override
+            shared_ptr<IPyIterator<int>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const override
             {
-                auto bwf= make_unique<BitsWidthFilter>(1, this->_bitwidth);
+                auto bwf= make_shared<BitsWidthFilter>(1, this->_bitwidth);
                 bwf->SetInput(src);
                 return bwf;
             };
@@ -357,10 +348,10 @@ namespace TBSKmodemCPP
         else
         {
             this->_asmethod_lock = true;// #解放はAsyncDemodulateXのcloseで
-            throw RecoverableException<unique_ptr<IPyIterator<int>>>(asmethod);
+            throw RecoverableException<shared_ptr<IPyIterator<int>>>(asmethod);
         }
     }
-    unique_ptr<IPyIterator<char>> TbskDemodulator::DemodulateAsChar(const shared_ptr<IPyIterator<double>>& src)
+    shared_ptr<IPyIterator<char>> TbskDemodulator::DemodulateAsChar(const shared_ptr<IPyIterator<double>>& src)
     {
         TBSK_ASSERT(!this->_asmethod_lock);
 #pragma warning(disable : 4250 )
@@ -401,8 +392,8 @@ namespace TBSKmodemCPP
         public:
             Asdem(TbskDemodulator& parent,const shared_ptr<IPyIterator<double>>& src) :AsyncDemodulateX<char>(parent, src) {}
         protected:
-            unique_ptr<IPyIterator<char>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const {
-                auto bwf = make_unique<CharFilter>();
+            shared_ptr<IPyIterator<char>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const {
+                auto bwf = make_shared<CharFilter>();
                 bwf->SetInput(src);
                 return bwf;
             };
@@ -423,7 +414,7 @@ namespace TBSKmodemCPP
         else
         {
             this->_asmethod_lock = true;// #解放はAsyncDemodulateXのcloseで
-            throw RecoverableException<unique_ptr<IPyIterator<char>>>(asmethod);
+            throw RecoverableException<shared_ptr<IPyIterator<char>>>(asmethod);
         }
     }
 };

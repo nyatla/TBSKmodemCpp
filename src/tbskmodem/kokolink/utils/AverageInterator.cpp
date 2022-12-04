@@ -12,7 +12,7 @@ namespace TBSKmodemCPP
     {
         double r;
         try {
-            r = this->Next();
+            r = SumIterator::Next();
         }
         catch (RecoverableStopIteration e) {
             throw e;
