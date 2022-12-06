@@ -49,7 +49,12 @@ namespace TBSKmodemCPP
 
 namespace TBSKmodemCPP
 {
+    //template <typename T> class AsyncDemodulateX : public virtual AsyncMethod<shared_ptr<IPyIterator<T>>> {};
     template <typename T> class AsyncDemodulateX;
+    class DemodulateAsBitAS :public virtual AsyncMethod<shared_ptr<IPyIterator<int>>> {};
+    class DemodulateAsIntAS :public virtual AsyncMethod<shared_ptr<IPyIterator<int>>> {};
+    class DemodulateAsCharAS :public virtual AsyncMethod<shared_ptr<IPyIterator<char>>> {};
+
     class TbskDemodulator
     {
         // """ nBit intイテレータから1バイト単位のhex stringを返すフィルタです。

@@ -67,7 +67,7 @@ namespace TBSKmodemCPP
 namespace TBSKmodemCPP
 {
 
-    class ASwaitForSymbol : public AsyncMethod<NullableResult<TBSK_INT64>> {
+    class WaitForSymbolAS_impl : public WaitForSymbolAS {
     private:
         const int _symbol_ticks;
         const int _sample_width;
@@ -86,7 +86,7 @@ namespace TBSKmodemCPP
         NullableResult<TBSK_INT64> _result;
 
     public:
-        ASwaitForSymbol(CoffPreamble& parent,const shared_ptr<IRoStream<double>>& src) :AsyncMethod(),
+        WaitForSymbolAS_impl(CoffPreamble& parent,const shared_ptr<IRoStream<double>>& src) :WaitForSymbolAS(),
             _symbol_ticks{ (int)parent._symbol->size() },
             _sample_width{ parent._cycle + 1 },
             _co_step{ 0 },
@@ -367,7 +367,7 @@ namespace TBSKmodemCPP
     NullableResult<TBSK_INT64> CoffPreamble::WaitForSymbol(const shared_ptr<IRoStream<double>>&& src)
     {
         TBSK_ASSERT(!this->_asmethtod_lock);
-        auto asmethtod = make_shared<ASwaitForSymbol>(*this, src);
+        auto asmethtod = make_shared<WaitForSymbolAS_impl>(*this, src);
         if (asmethtod->Run())
         {
             return asmethtod->GetResult();
@@ -376,7 +376,7 @@ namespace TBSKmodemCPP
         {
             //# ロックする（解放はASwaitForSymbolのclose内で。）
             this->_asmethtod_lock = true;
-            throw RecoverableException<NullableResult<TBSK_INT64>>(asmethtod);
+            throw RecoverableException<WaitForSymbolAS>(asmethtod);
         }
     }
 

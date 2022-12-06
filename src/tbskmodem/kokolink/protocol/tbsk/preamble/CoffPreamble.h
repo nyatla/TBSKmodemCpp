@@ -9,7 +9,9 @@
 namespace TBSKmodemCPP
 {
 
-    class ASwaitForSymbol;
+    class WaitForSymbolAS : public AsyncMethod<NullableResult<TBSK_INT64>> {
+    };
+    class WaitForSymbolAS_impl;
 
     // """ 台形反転信号プリアンブルです。
     // """
@@ -17,7 +19,7 @@ namespace TBSKmodemCPP
     {
     public:
     private:
-        friend ASwaitForSymbol; 
+        friend WaitForSymbolAS_impl;
         const double _threshold;
         const shared_ptr<const TraitTone> _symbol;
         const int _cycle; //#平坦部分のTick数

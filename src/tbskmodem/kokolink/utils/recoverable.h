@@ -32,31 +32,27 @@ namespace TBSKmodemCPP
     // T型のリカバリ手段のインスタンスはDetach関数で取得できます。
     // リカバリを取得しなかった場合は例外破棄と同時にその手段も破棄します。
     // 
-    template <typename T> class RecoverableException :exception
+    template <typename ASYNC_METHOD> class RecoverableException :public exception
     {
         // """ 関数を再試行します。再試行可能な状態で失敗した場合は、自分自信を返します。
         // """
     private:
-        const shared_ptr<AsyncMethod<T>> _recover_instance;
+        shared_ptr<ASYNC_METHOD> _recover_instance;
+        RecoverableException() = delete;
     public:
-        RecoverableException(const shared_ptr<AsyncMethod<T>>& recover_instance);
-        virtual ~RecoverableException();
-        virtual void Close();
-        const shared_ptr<AsyncMethod<T>> Detach();
+        RecoverableException(shared_ptr<ASYNC_METHOD>&& recover_instance) : _recover_instance{ recover_instance }{}
+        virtual ~RecoverableException() {
+            this->Close();
+        }
+        virtual void Close() {
+            this->_recover_instance->Close();
+        }
+        shared_ptr<ASYNC_METHOD> Detach() {
+            return move(this->_recover_instance);
+        }
     };
 
-    template <typename T> RecoverableException<T>::RecoverableException(const shared_ptr<AsyncMethod<T>>& recover_instance) : _recover_instance{ recover_instance }
-    {
-    }
-    template <typename T> RecoverableException<T>::~RecoverableException() {
-        this->Close();
-    }
-    template <typename T> const shared_ptr<AsyncMethod<T>> RecoverableException<T>::Detach()
-    {
-        return move(this->_recover_instance);
-    }
-    template <typename T> void RecoverableException<T>::Close()
-    {
-        this->_recover_instance->Close();
-    }
+    //template <typename T> RecoverableException<T>::RecoverableException(const shared_ptr<AsyncMethod<T>>& recover_instance) : _recover_instance{ recover_instance }
+    //{
+    //}
 }
