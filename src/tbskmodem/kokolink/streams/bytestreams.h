@@ -11,7 +11,7 @@ namespace TBSKmodemCPP
         // """BigEndianのUint32を読み出す
         // """
     public:
-        int GetAsUInt32be();
+        int GetAsUInt32be()override;
         // """gets関数をラップします。
         // """
         unique_ptr<vector<TBSK_BYTE>> GetAsByteArray(int maxsize)override;

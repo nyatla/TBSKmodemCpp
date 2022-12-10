@@ -60,7 +60,7 @@ namespace TBSKmodemCPP
                 this->push_back(j * (i * 2 - 1));
             }
         }
-        this->_sequence = move(sequence);
+        this->_sequence = std::move(sequence);
     }
     MSeqTone::~MSeqTone() {
     }

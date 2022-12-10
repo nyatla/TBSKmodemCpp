@@ -9,7 +9,6 @@ namespace TBSKmodemCPP
 {
     using std::make_shared;
     using std::make_unique;
-    using std::move;
     using std::vector;
 }
 

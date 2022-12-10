@@ -48,7 +48,7 @@ namespace TBSKmodemCPP
             this->_recover_instance->Close();
         }
         shared_ptr<ASYNC_METHOD> Detach() {
-            return move(this->_recover_instance);
+            return std::move(this->_recover_instance);
         }
     };
 

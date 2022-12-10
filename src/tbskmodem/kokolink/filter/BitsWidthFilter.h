@@ -23,7 +23,7 @@ namespace TBSKmodemCPP
         BitsWidthFilter& SetInput(const shared_ptr<IRoStream<int>>&& src)override;
         virtual ~BitsWidthFilter();
         int Next()override;
-        TBSK_INT64 GetPos()const;
+        TBSK_INT64 GetPos()const override;
     };
 #pragma warning( default : 4250 )
 

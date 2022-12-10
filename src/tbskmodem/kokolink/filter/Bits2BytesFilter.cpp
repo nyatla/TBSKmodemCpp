@@ -5,7 +5,7 @@ namespace TBSKmodemCPP
 
     Bits2BytesFilter::Bits2BytesFilter(int input_bits) :
         _input_bits{input_bits},
-        _iter{move(unique_ptr<BitsWidthConvertIterator>())}
+        _iter{ std::move(unique_ptr<BitsWidthConvertIterator>())}
     {
 
     }

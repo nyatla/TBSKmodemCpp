@@ -53,7 +53,7 @@ namespace TBSKmodemCPP
             //this->_pa = pa;
             auto w = make_shared<PyIterator<int>>(bs);
             auto ptr = make_unique<BitStream>(w, 1);
-            this->SetInput(move(ptr));
+            this->SetInput(std::move(ptr));
             //this->_bitstream = bs;
             //this->SetInput(new BitStream(Functions.Flatten(new int[] { 0, 1 }, b, new int[] { 1 }, c, d), bitwidth:1));
         }
@@ -121,7 +121,7 @@ namespace TBSKmodemCPP
             this->_closed = false;
 
         }
-        NullableResult<TBSK_INT64> GetResult()
+        NullableResult<TBSK_INT64> GetResult()override
         {
             return this->_result; //コピー可能な値なので特に何もすることなく。
             //TBSK_ASSERT(this->_co_step >= 4);

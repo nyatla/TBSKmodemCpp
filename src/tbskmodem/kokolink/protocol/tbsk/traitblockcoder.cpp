@@ -79,7 +79,7 @@ namespace TBSKmodemCPP
     TraitBlockDecoder::TraitBlockDecoder(int trait_block_ticks, double threshold) :
         _trait_block_ticks{ trait_block_ticks },
         _threshold{ threshold },
-        _avefilter{ move(unique_ptr<AverageInterator>()) }
+        _avefilter{ std::move(unique_ptr<AverageInterator>()) }
     {
         this->_is_eos = true;
         //this->_samples = new List<double>();// #観測値

@@ -23,7 +23,7 @@ namespace TBSKmodemCPP
         if (!ifs) {
             throw BinaryReaderException();
         }
-        this->_ifs = move(ifs);
+        this->_ifs = std::move(ifs);
     }
     FileReader::~FileReader() {
         this->_ifs->close();
@@ -54,7 +54,7 @@ namespace TBSKmodemCPP
         if (!ofs) {
             throw BinaryReaderException();
         }
-        this->_ofs = move(ofs);
+        this->_ofs = std::move(ofs);
 
     }
     FileWriter::~FileWriter() {

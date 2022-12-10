@@ -56,7 +56,7 @@ namespace TBSKmodemCPP
         }
         // @property
     public:
-        TBSK_INT64 GetPos()const
+        TBSK_INT64 GetPos()const override
         {
             return  this->_pos;
         }
@@ -180,7 +180,7 @@ namespace TBSKmodemCPP
             return this->_result;
 
         }
-        void Close()
+        void Close()override
         {
             if (!this->_closed)
             {
@@ -190,7 +190,7 @@ namespace TBSKmodemCPP
 
             }
         }
-        bool Run()
+        bool Run()override
         {
             //# print("run",self._co_step)
             TBSK_ASSERT(!this->_closed);
