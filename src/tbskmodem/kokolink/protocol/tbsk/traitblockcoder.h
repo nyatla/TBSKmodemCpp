@@ -7,7 +7,7 @@
 #include "../../types/types.h"
 #include "../../utils/math/corrcoef/SelfCorrcoefIterator.h"
 #include <queue>
-#include <math.h>
+#include <cmath>
 
 
 namespace TBSKmodemCPP

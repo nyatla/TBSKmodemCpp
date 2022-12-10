@@ -1,5 +1,5 @@
 #include "./SelfCorrcoefIterator.h"
-#include <math.h>
+#include <cmath>
 
 namespace TBSKmodemCPP
 {

@@ -1,7 +1,7 @@
 #include "./PcmData.h"
-#include <math.h>
 #include <stdexcept>
 #include <exception>
+#include <cmath>
 
 namespace TBSKmodemCPP {
     using std::invalid_argument;
@@ -185,7 +185,7 @@ namespace TBSKmodemCPP
                 data_size = data_size - 1;
             }
             //TBSK_ASSERT(data_size%2==0);
-            double r = (pow(2, 16) - 1) / 2;//(2 * *16 - 1)//2 #Daisukeパッチ
+            double r = (std::pow(2, 16) - 1) / 2;//(2 * *16 - 1)//2 #Daisukeパッチ
             int c = 0;
             TBSK_UINT16 b = 0;
             for (auto i = 0;i < data_size;i++)

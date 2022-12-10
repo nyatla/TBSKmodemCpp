@@ -3,7 +3,7 @@
 #include "../../streams/BitStream.h"
 #include "../../filter/BitsWidthFilter.h"
 #include "./preamble/CoffPreamble.h"
-
+#include <string.h>
 namespace TBSKmodemCPP
 {
 #pragma warning( disable : 4250 )
@@ -94,7 +94,7 @@ namespace TBSKmodemCPP
     TbskModulator::~TbskModulator() {
     }
 
-    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IRoStream<int>>&& src)
+    shared_ptr<IPyIterator<double>> TbskModulator::_ModulateAsBit(const shared_ptr<IRoStream<int>>& src)
     {
         auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
 
@@ -107,11 +107,14 @@ namespace TBSKmodemCPP
         };
         return make_shared<IterChain<double>>(d);
     }
-    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IPyIterator<int>>& src)
-    {
-        return this->ModulateAsBit(make_shared<RoStream<int>>(src));
+    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IRoStream<int>>&& src) {
+        return this->_ModulateAsBit(src);
     }
-
+    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IPyIterator<int>>&& src, int bitwidth) {
+        auto s = make_shared<BitsWidthFilter>(bitwidth);
+        s->SetInput(make_shared<RoStream<int>>(src));
+        return this->ModulateAsBit(s);
+    }
 
     shared_ptr<IPyIterator<double>> TbskModulator::Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth)
     {
@@ -124,7 +127,7 @@ namespace TBSKmodemCPP
     shared_ptr<IPyIterator<double>> TbskModulator::Modulate(const char* src, int length)
     {
         if (length < 0) {
-            length = (int)strnlen_s(src, (size_t)16 * 1024);
+            length = (int)strnlen(src, (size_t)16 * 1024);
         }
         auto d = make_shared<vector<int>>();
         for (auto i = 0;i < length;i++) {

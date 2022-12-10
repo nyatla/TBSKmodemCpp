@@ -1,7 +1,5 @@
-﻿#define _CRTDBG_MAP_ALLOC
-#include <crtdbg.h>
-#include <stdlib.h>
-#include "../../../src/tbskmodem/tbskmodem.h"
+﻿#include <stdlib.h>
+#include "../../src/tbskmodem/tbskmodem.h"
 #include <memory>
 #include <vector>
 using namespace TBSKmodemCPP;
@@ -25,6 +23,5 @@ int main()
 		PcmData pcm(d, 16, 8000);
 		PcmData::Dump(pcm, fw);
 	}
-	_CrtDumpMemoryLeaks();
 	return 0;
 }

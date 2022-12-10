@@ -1,5 +1,4 @@
 #include "SumIterator.h"
-#include <math.h>
 namespace TBSKmodemCPP
 {
 

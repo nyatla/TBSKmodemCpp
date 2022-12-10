@@ -35,40 +35,40 @@ namespace TBSKmodemCPP
     template <typename T> class PyIterator :public NoneCopyConstructor_class, public virtual IPyIterator<T>
     {
     private:
-        template <typename T> class VectorWrapper :public NoneCopyConstructor_class
+        class VectorWrapper :public NoneCopyConstructor_class
         {
         public:
             const vector<T>* _buf;
         public:
             VectorWrapper(const vector<T>* src) :_buf{ src } {}
         };
-        template <typename T> class PtrWrapperCU :public VectorWrapper<T>
+        class PtrWrapperCU :public VectorWrapper
         {
         private:
             const unique_ptr<const vector<T>>& _src;
         public:
-            PtrWrapperCU(const unique_ptr< const vector<T>>& src) :_src{ src }, VectorWrapper<T>(src.get()) {}
+            PtrWrapperCU(const unique_ptr< const vector<T>>& src) :_src{ src }, VectorWrapper(src.get()) {}
         };
-        template <typename T> class PtrWrapperCS :public VectorWrapper<T>
+        class PtrWrapperCS :public VectorWrapper
         {
         private:
             shared_ptr<const vector<T>> _src;
         public:
-            PtrWrapperCS(const shared_ptr<const vector<T>>& src) :_src{ src }, VectorWrapper<T>(src.get()) {}
+            PtrWrapperCS(const shared_ptr<const vector<T>>& src) :_src{ src }, VectorWrapper(src.get()) {}
         };
 
     private:
         size_t _ptr = 0;
-        const unique_ptr<VectorWrapper<T>> _src;
+        const unique_ptr<VectorWrapper> _src;
     public:
         PyIterator(const vector<T>* src) :
-            _src{ make_unique<VectorWrapper<T>>(src) } {}
+            _src{ make_unique<VectorWrapper>(src) } {}
         PyIterator(const unique_ptr<const vector<T>>&& src) :
-            _src{make_unique<PtrWrapperCU<T>>(src) } {};//参照
+            _src{make_unique<PtrWrapperCU>(src) } {};//参照
         PyIterator(const shared_ptr<const vector<T>>&& src) :
-            _src{ make_unique<PtrWrapperCS<T>>(src) } {};//共有
+            _src{ make_unique<PtrWrapperCS>(src) } {};//共有
         PyIterator(const vector<T>& src) :
-            _src{ make_unique<VectorWrapper<T>>(&src) } {};//参照
+            _src{ make_unique<VectorWrapper>(&src) } {};//参照
         T Next()override
         {
             if (this->_ptr >= this->_src->_buf->size()) {

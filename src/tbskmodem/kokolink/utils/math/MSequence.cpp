@@ -1,5 +1,5 @@
 #include "MSequence.h"
-#include <math.h>
+#include <cmath>
 #include <vector>
 #include <iterator>
 namespace TBSKmodemCPP {
@@ -11,7 +11,7 @@ namespace TBSKmodemCPP
     MSequence::MSequence(int bits, int tap, TBSK_UINT32 sr):
         _bits{bits},
         _tap{tap},
-        _mask{ (TBSK_UINT32)(pow(2, bits) - 1) }//(2**bits-1);
+        _mask{ (TBSK_UINT32)(std::pow(2, bits) - 1) }//(2**bits-1);
     {
         TBSK_ASSERT(bits < 64);
         TBSK_ASSERT(bits >= 2);

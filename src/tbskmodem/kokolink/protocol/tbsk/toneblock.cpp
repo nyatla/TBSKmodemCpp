@@ -1,5 +1,5 @@
 #include "toneblock.h"
-#include <math.h>
+#include <cmath>
 
 namespace TBSKmodemCPP
 {
@@ -33,7 +33,7 @@ namespace TBSKmodemCPP
         auto d1 = vector<double>();
         for (auto i = 0; i < points; i++)
         {
-            d1.push_back((double)sin(s + i * TBSK_PI * 2 / points));
+            d1.push_back((double)std::sin(s + i * TBSK_PI * 2 / points));
         }
         for (auto i = 0; i < cycle; i++)
         {

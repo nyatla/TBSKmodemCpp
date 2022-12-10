@@ -3,7 +3,7 @@
 #include <crtdbg.h>
 
 #include "../../../src/tbskmodem/tbskmodem.h"
-#include <math.h>
+#include <cmath>
 using namespace TBSKmodemCPP; 
 using namespace std;
 
@@ -12,7 +12,7 @@ int main()
 	{
 		vector<double> a(16000);
 		for (auto i = 0;i < a.size();i++) {
-			a[i] = sin(i * 3.1415 * 2 / 80);
+			a[i] = std::sin(i * 3.1415 * 2 / 80);
 		}
 		{
 			FileWriter fw("./test.wav");

@@ -1,5 +1,5 @@
 #include "riffio.h"
-
+#include <cstring>
 namespace TBSKmodemCPP
 {
 
@@ -21,7 +21,7 @@ namespace TBSKmodemCPP
         _size{ this->_buf->WriteInt32LE(size) }
 
     {
-        TBSK_ASSERT(strnlen_s(name, 5) <= 4);
+        TBSK_ASSERT(strnlen(name, 5) <= 4);
     }
     Chunk::~Chunk(){}
 

@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <memory>
 #include <fstream>
-
+#include <cmath>
 
 
 
@@ -107,7 +107,7 @@ namespace TBSKmodemCPP
     {
     private:
         IPyIterator<double>& _src;
-        const int DISK = (int)((pow(2, 16) - 1) / 2); //#Daisukeパッチ
+        const int DISK = (int)((std::pow(2, 16) - 1) / 2); //#Daisukeパッチ
         int _bitnum = 0;
         TBSK_BYTE tmp=0;
     public:
@@ -183,17 +183,17 @@ namespace TBSKmodemCPP
     }
     size_t MemBuffer::WriteInt16LE(const size_t v) {
         const TBSK_BYTE w[2] = {
-        ((v >> 0) & 0xff),
-        ((v >> 8) & 0xff)
+        (TBSK_BYTE)((v >> 0) & 0xff),
+        (TBSK_BYTE)((v >> 8) & 0xff)
         };
         return this->_WriteBytes(w, 2);
     }
     size_t MemBuffer::WriteInt32LE(const size_t v) {
         const TBSK_BYTE w[4] = {
-        ((v >> 0) & 0xff),
-        ((v >> 8) & 0xff),
-        ((v >> 16) & 0xff),
-        ((v >> 24) & 0xff)
+        (TBSK_BYTE)((v >> 0) & 0xff),
+        (TBSK_BYTE)((v >> 8) & 0xff),
+        (TBSK_BYTE)((v >> 16) & 0xff),
+        (TBSK_BYTE)((v >> 24) & 0xff)
         };
         return this->_WriteBytes(w, 4);
     };

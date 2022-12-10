@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #include "../../../src/tbskmodem/tbskmodem.h"
-#include <math.h>
+#include <cmath>
 #include <memory>
 #include <vector>
 using namespace TBSKmodemCPP;
