@@ -53,6 +53,6 @@ $(PATH_OUTPUT)/$(NAME_LIBRARY):$(TARGETS)
 	ranlib $@
 
 $(TARGETS):$(SOURCES);mkdir -p $(PATH_OBJECT)
-	$(CC) $(FLGS) -c $(TARGET_INCLUDE)  $(call TARGET_TO_SRC_NAME,$@) -o $(call TARGET_TO_OBJ_NAME,$@)
+	$(CC) $(FLGS) -Wemcc -c $(TARGET_INCLUDE)  $(call TARGET_TO_SRC_NAME,$@) -o $(call TARGET_TO_OBJ_NAME,$@)
 
 

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang=en-us>
+<head>
+  <meta charset=utf-8>
+  <meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+  <title>Hello WASM World!</title>
+</head>
+<body>
+    <button class=mybutton>Run mulBy2</button><br>
+    <script>
+        if (typeof _TBSKmodemJS === 'undefined') {
+            //グローバルオブジェクトに配置する.
+            _TBSKmodemJS = {
+                _initialized: false,
+                initialize: function (m) {
+
+                    if (this._initialized) {
+                        return;
+                    }
+                    function set_default(a, v) { return (a === undefined || a === null) ? v : a; }
+
+                    class StopIteration extends Error{
+                    }
+                    class RecoverableStopIteration extends Error {
+                    }
+
+
+                    this.getPointerHolderSize = function () {
+                        return m._wasm_tbskmodem_PointerHolder_Size();
+                    }
+                    class WasmProxy {
+                        constructor(wasm_instance) {
+                            this._wasm_instance = wasm_instance;
+                        }
+                        dispose() {
+                            m._wasm_tbskmodem_Dispose(this._wasm_instance);
+                        }
+                    }
+                    this.TraitTone = class extends WasmProxy {
+                        constructor(double_array) {
+                            super(m._wasm_tbskmodem_TraitTone());
+                        }
+                    }
+                    this.SieTone = class extends WasmProxy {
+                        constructor(poinsts, cycle) {
+                            let _cycle = set_default(cycle, 1);
+                            super(m._wasm_tbskmodemm_SinTone(points, _cycle));
+                        }
+                    }
+                    this.XPskSinTone = class extends WasmProxy {
+                        constructor(poinsts, cycle, div) {
+                            let _cycle = set_default(cycle, 1);
+                            let _div = set_default(div, 8);
+                            super(m._wasm_tbskmodem_XPskSinTone(poinsts, _cycle, _div));
+                        }
+                    }
+                    this.CoffPreamble = class extends WasmProxy {
+                        constructor(tone, threshold, cycle) {
+                            let _threshold = set_default(threshold, 1.0);
+                            let _cycle = set_default(cycle, 4);
+                            super(m._wasm_tbskmodem_CoffPreamble(tone._wasm_instance, _threshold, _cycle));
+                        }
+                    }
+                    //うまく動くかわからない
+                    class DoublePyIterator extends WasmProxy {
+                        constructor(wasm_instance) {
+                            super(wasm_instance);
+                        }
+                        next() {
+                            return m._wasm_tbskmodem_IPyIterator_double_next(this._wasm_instance);
+                        }
+                        value() {
+                            return m._wasm_tbskmodem_IPyIterator_double_value(this._wasm_instance);
+                        }
+                    }
+                    this.IPyIterator = DoublePyIterator;
+                    //うまく動くかわからない
+                    class CallbackHandlerTable {
+                        constructor() {
+                            this._cb_table = [];
+                        }
+                        add(handler) {
+                            let tbl = this._cb_table;
+                            for (var i = 0; i < tbl.length; i++) {
+                                if (tbl[i] == null) {
+                                    tbl[i] = handler;
+                                    return i;
+                                }
+                            }
+                            tbl.push(handler);
+                            return tbl.length - 1;
+                        }
+                        release(handle) {
+                            let tbl = this._cb_table;
+                            tbl[handle] = null;
+                        }
+                    }
+                    let _cbhtbl = new CallbackHandlerTable();
+                    this._callback_handler = function (handle) //_TBSKmodemJS._callback_handlerをコールバックハンドラにしてるからね！
+                    {
+                        return _cbhtbl[handle]();
+                    }
+
+
+                    //うまく動くかわからない
+                    this.IJsIntProvider=class extends WasmProxy {
+                        constructor() {
+                            super(m._wasm_tbskmodem_JsIntProvider());
+                            let _t = this;
+                            let handle = _cbhtbl.add(function () { _t._cbnext() });
+                            m._wasm_tbskmodem_JsIntProvider_setHandle(this._wasm_instance, handle);
+                            this._handle = handle;
+                        }
+                        dispose() {
+                            _cbhtbl.release(this._handle);
+                            super.dispose()
+                        }
+
+                        _cbnext() {
+                            return 1;//暫定実装
+                        }
+                    }
+
+
+
+                    this.TbskModulator = class extends WasmProxy {
+                        constructor(tone, preamble) {
+                            super(m._wasm_tbskmodem_TbskModulator(tone._wasm_instance, preamble._wasm_instance));
+                        }
+                        //
+                        // @params src as IPyIterator<double>
+                        //
+                        //うまく動くかわからない
+                        modulate(src) {
+                            return new DoublePyIterator(
+                                m._wasm_tbskmodem_TbskModulator_Modulate(this._wasm_instance, src._wasm_instance)
+                            );
+                        }
+                    }
+
+                }
+            }
+        }
+
+
+
+
+
+
+
+		window.addEventListener('load', function(){
+            Module.onRuntimeInitialized = function () {
+                _TBSKmodemJS.initialize(Module);
+                let tj = _TBSKmodemJS;
+                var tone = new tj.XPskSinTone(10);
+                var preamble = new tj.CoffPreamble(tone);
+                var mod = new tj.TbskModulator(tone, preamble);
+                var a = mod.modulate(new tj.IJsIntProvider());
+                console.log(tj.getPointerHolderSize());
+
+            }
+
+
+
+
+
+
+
+
+		
+		});  
+  </script>
+  <script async src="wasm_main.js"></script>
+</body>
+</html>
