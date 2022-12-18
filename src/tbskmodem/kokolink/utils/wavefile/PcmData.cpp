@@ -56,7 +56,7 @@ namespace TBSKmodemCPP
         throw std::invalid_argument("Invalid bits");
     }
     static unique_ptr<vector<TBSK_BYTE>> Float2bytes(const vector<double>& fdata, int bits) {
-        PyIterator<double> a(fdata);
+        PyIterator<double> a(fdata);//一次利用限定
         return Float2bytes(a, bits);
     }
 
