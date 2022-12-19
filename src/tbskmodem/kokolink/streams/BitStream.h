@@ -16,7 +16,7 @@ namespace TBSKmodemCPP
         // """ 任意ビット幅のintストリームを1ビット単位のビットストリームに展開します。
         // """
     public:
-        BitStream(const shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8);
+        BitStream(const shared_ptr<IPyIterator<int>>& src, int bitwidth = 8);
         virtual ~BitStream();
         int Next()override;
         TBSK_INT64 GetPos()const override;

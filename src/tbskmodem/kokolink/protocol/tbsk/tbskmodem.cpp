@@ -107,16 +107,16 @@ namespace TBSKmodemCPP
         };
         return make_shared<IterChain<double>>(d);
     }
-    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IRoStream<int>>&& src) {
+    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IRoStream<int>>& src) {
         return this->_ModulateAsBit(src);
     }
-    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IPyIterator<int>>&& src, int bitwidth) {
+    shared_ptr<IPyIterator<double>> TbskModulator::ModulateAsBit(const shared_ptr<IPyIterator<int>>& src, int bitwidth) {
         auto s = make_shared<BitsWidthFilter>(bitwidth);
         s->SetInput(make_shared<RoStream<int>>(src));
         return this->ModulateAsBit(s);
     }
 
-    shared_ptr<IPyIterator<double>> TbskModulator::Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth)
+    shared_ptr<IPyIterator<double>> TbskModulator::Modulate(const shared_ptr<IPyIterator<int>>& src, int bitwidth)
     {
         auto s = make_shared<BitsWidthFilter>(bitwidth);
         s->SetInput(make_shared<RoStream<int>>(src));
@@ -381,13 +381,14 @@ namespace TBSKmodemCPP
         auto asmethod = make_shared<DemodulateAsIntAS_impl>(*this, src,bitwidth);
         if (asmethod->Run())
         {
-            auto ret = asmethod->GetResult();
+            const auto ret = asmethod->GetResult();
             return ret;
         }
         else
         {
             this->_asmethod_lock = true;// #解放はAsyncDemodulateXのcloseで
-            throw RecoverableException<DemodulateAsIntAS>(std::dynamic_pointer_cast<DemodulateAsIntAS>(asmethod));
+            //throw RecoverableException<DemodulateAsIntAS>(std::dynamic_pointer_cast<DemodulateAsIntAS>(asmethod));
+            throw RecoverableException<DemodulateAsIntAS>(asmethod);
         }
     }
 
@@ -404,7 +405,7 @@ namespace TBSKmodemCPP
             }
             virtual ~CharFilter() {
             }
-            CharFilter& SetInput(const shared_ptr<IRoStream<int>>&& src)override
+            CharFilter& SetInput(const shared_ptr<IRoStream<int>>& src)override
             {
                 this->_pos = 0;
                 this->_iter = make_unique<BitsWidthConvertIterator>(src, 1, 8);
@@ -455,7 +456,7 @@ namespace TBSKmodemCPP
 //            }
 //            virtual ~CharFilter() {
 //            }
-//            CharFilter& SetInput(const shared_ptr<IRoStream<int>>&& src)override
+//            CharFilter& SetInput(const shared_ptr<IRoStream<int>>& src)override
 //            {
 //                this->_pos = 0;
 //                this->_iter = make_unique<BitsWidthConvertIterator>(src, 1, 8);

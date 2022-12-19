@@ -35,7 +35,7 @@ namespace TBSKmodemCPP
     public:
         TraitBlockEncoder(const shared_ptr<const TraitTone>& tone);
         virtual ~TraitBlockEncoder();
-        TraitBlockEncoder& SetInput(const shared_ptr<IBitStream>&& src)override;
+        TraitBlockEncoder& SetInput(const shared_ptr<IBitStream>& src)override;
         double Next()override;
         // @property
         TBSK_INT64 GetPos()const override;
@@ -74,7 +74,7 @@ namespace TBSKmodemCPP
         //         src
         //             TBSK信号の開始エッジにポインタのあるストリームをセットします。
         // """
-        TraitBlockDecoder& SetInput(const shared_ptr<IRoStream<double>>&& src)override;
+        TraitBlockDecoder& SetInput(const shared_ptr<IRoStream<double>>& src)override;
 
         int Next()override;
         // @property

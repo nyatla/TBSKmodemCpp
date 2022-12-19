@@ -14,7 +14,7 @@ namespace TBSKmodemCPP
     }
     Bits2StrFilter::~Bits2StrFilter() {
     }
-    Bits2StrFilter& Bits2StrFilter::SetInput(const shared_ptr<IRoStream<int>>&& src)
+    Bits2StrFilter& Bits2StrFilter::SetInput(const shared_ptr<IRoStream<int>>& src)
     {
         this->_pos = 0;
         this->_savedata.clear();

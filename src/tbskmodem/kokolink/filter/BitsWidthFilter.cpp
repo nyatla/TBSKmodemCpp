@@ -13,7 +13,7 @@ namespace TBSKmodemCPP
     BitsWidthFilter::~BitsWidthFilter() {
     }
 
-    BitsWidthFilter& BitsWidthFilter::SetInput(const shared_ptr<IRoStream<int>>&& src)
+    BitsWidthFilter& BitsWidthFilter::SetInput(const shared_ptr<IRoStream<int>>& src)
     {
         this->_pos = 0;
         this->_iter = std::move(make_unique<BitsWidthConvertIterator>(src, this->_input_bits, this->_output_bits));

@@ -8,8 +8,8 @@ namespace TBSKmodemCPP
 }
 namespace TBSKmodemCPP
 {
-    BitStream::BitStream(const shared_ptr<IPyIterator<int>>&& src, int bitwidth) :
-        _bw{make_unique<BitsWidthConvertIterator>(dynamic_pointer_cast<IPyIterator<int>>(src), bitwidth, 1) }
+    BitStream::BitStream(const shared_ptr<IPyIterator<int>>& src, int bitwidth) :
+        _bw{make_unique<BitsWidthConvertIterator>(src, bitwidth, 1) }
     {
         this->_pos = 0;
     }

@@ -41,9 +41,9 @@ namespace TBSKmodemCPP
         shared_ptr<IPyIterator<double>> _ModulateAsBit(const shared_ptr<IRoStream<int>>& src);
 
     public:
-        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IRoStream<int>>&& src);
-        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IPyIterator<int>>&& src, int bitwidth);
-        shared_ptr<IPyIterator<double>> Modulate(const shared_ptr<IPyIterator<int>>&& src, int bitwidth = 8);
+        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IRoStream<int>>& src);
+        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IPyIterator<int>>& src, int bitwidth);
+        shared_ptr<IPyIterator<double>> Modulate(const shared_ptr<IPyIterator<int>>& src, int bitwidth = 8);
         shared_ptr<IPyIterator<double>> Modulate(const char* src, int length = -1);
     };
 }

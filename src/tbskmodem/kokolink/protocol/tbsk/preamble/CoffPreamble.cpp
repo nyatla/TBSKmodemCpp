@@ -364,7 +364,7 @@ namespace TBSKmodemCPP
         // # return enc.setInput(BitStream([0,1]+[1,1]+[1]+[0,1]+[0,0,1],1))
         // # return enc.setInput(BitStream([0,1,1,1,1,0,1,0,0,1],1))
     }
-    NullableResult<TBSK_INT64> CoffPreamble::WaitForSymbol(const shared_ptr<IRoStream<double>>&& src)
+    NullableResult<TBSK_INT64> CoffPreamble::WaitForSymbol(const shared_ptr<IRoStream<double>>& src)
     {
         TBSK_ASSERT(!this->_asmethtod_lock);
         auto asmethtod = make_shared<WaitForSymbolAS_impl>(*this, src);

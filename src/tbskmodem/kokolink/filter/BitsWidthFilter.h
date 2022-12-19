@@ -20,7 +20,7 @@ namespace TBSKmodemCPP
     public:
         BitsWidthFilter(int input_bits = 8, int output_bits = 1);
 
-        BitsWidthFilter& SetInput(const shared_ptr<IRoStream<int>>&& src)override;
+        BitsWidthFilter& SetInput(const shared_ptr<IRoStream<int>>& src)override;
         virtual ~BitsWidthFilter();
         int Next()override;
         TBSK_INT64 GetPos()const override;

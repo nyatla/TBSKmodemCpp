@@ -12,7 +12,7 @@ namespace TBSKmodemCPP
     Bits2BytesFilter::~Bits2BytesFilter() {
     }
 
-    Bits2BytesFilter& Bits2BytesFilter::SetInput(const shared_ptr<IRoStream<int>>&& src)
+    Bits2BytesFilter& Bits2BytesFilter::SetInput(const shared_ptr<IRoStream<int>>& src)
     {
         this->_pos = 0;
         this->_iter =make_unique<BitsWidthConvertIterator>(src, this->_input_bits, 8);

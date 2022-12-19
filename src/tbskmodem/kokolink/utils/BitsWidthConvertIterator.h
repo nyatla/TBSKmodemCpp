@@ -18,7 +18,7 @@ namespace TBSKmodemCPP
     // """
     class BitsWidthConvertIterator :public NoneCopyConstructor_class,virtual public IRecoverableIterator<int> {
     private:
-        shared_ptr<IPyIterator<int>> _src;
+        const shared_ptr<IPyIterator<int>> _src;
         bool _is_eos;
         const int _input_bits;
         const int _output_bits;
@@ -35,7 +35,7 @@ namespace TBSKmodemCPP
         //     self._bits  =0#byte値
         //     self._n_bits=0 #読み出し可能ビット数
     public:
-        BitsWidthConvertIterator(shared_ptr<IPyIterator<int>>&& src, int input_bits = 8, int output_bits = 1);
+        BitsWidthConvertIterator(const shared_ptr<IPyIterator<int>>& src, int input_bits = 8, int output_bits = 1);
         virtual ~BitsWidthConvertIterator();
 
         int Next();

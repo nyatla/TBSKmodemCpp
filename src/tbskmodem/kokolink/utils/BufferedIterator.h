@@ -11,13 +11,13 @@ namespace TBSKmodemCPP
     {
     private:
         unique_ptr<RingBuffer<T>> _buf;
-        shared_ptr<IPyIterator<T>> _src;
+        const shared_ptr<IPyIterator<T>> _src;
 
         // def __init__(self,src:Iterator[T],size:int):
         //     self._src=src
         //     self._buf=RingBuffer(size,0)
     public:
-        BufferedIterator(shared_ptr<IPyIterator<T>>&& src, int size, const T pad) :
+        BufferedIterator(const shared_ptr<IPyIterator<T>>& src, int size, const T pad) :
             _src{ src },
             _buf{make_unique<RingBuffer<T>>(size, pad) }
         {

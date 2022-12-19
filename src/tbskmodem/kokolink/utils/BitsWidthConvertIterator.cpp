@@ -3,7 +3,7 @@ namespace TBSKmodemCPP
 {
 
 
-    BitsWidthConvertIterator::BitsWidthConvertIterator(shared_ptr<IPyIterator<int>>&& src, int input_bits, int output_bits) :
+    BitsWidthConvertIterator::BitsWidthConvertIterator(const shared_ptr<IPyIterator<int>>& src, int input_bits, int output_bits) :
         _src{ src },
         _input_bits{ input_bits },
         _output_bits{ output_bits }

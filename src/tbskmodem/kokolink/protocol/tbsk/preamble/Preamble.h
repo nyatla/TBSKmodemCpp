@@ -6,6 +6,6 @@ namespace TBSKmodemCPP
     class Preamble :public NoneCopyConstructor_class{
     public:
         virtual shared_ptr<IRoStream<double>> GetPreamble()const = 0;
-        virtual NullableResult<TBSK_INT64> WaitForSymbol(const shared_ptr<IRoStream<double>>&& src) = 0;
+        virtual NullableResult<TBSK_INT64> WaitForSymbol(const shared_ptr<IRoStream<double>>& src) = 0;
     };
 }

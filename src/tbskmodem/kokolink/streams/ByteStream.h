@@ -12,13 +12,13 @@ namespace TBSKmodemCPP
 
     private:
         TBSK_INT64 _pos;
-        shared_ptr<IPyIterator<int>> _iter;
+        const shared_ptr<IPyIterator<int>> _iter;
         // """ iterをラップするByteStreamストリームを生成します。
         //     bytesの場合は1バイトづつ返します。
         //     strの場合はbytesに変換してから1バイトづつ返します。
         // """
     private:
-        ByteStream(shared_ptr<IPyIterator<int>>&& src, int inital_pos = 0);
+        ByteStream(const shared_ptr<IPyIterator<int>>& src, int inital_pos = 0);
     public:
         //ByteStream(IPyIterator<TBSK_BYTE>& ref_src, int inital_pos = 0);
         //ByteStream(IPyIterator<char>& ref_src, int inital_pos = 0);

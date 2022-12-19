@@ -8,7 +8,7 @@ namespace TBSKmodemCPP
     private:
         const shared_ptr<IPyIterator<TBSK_BYTE>> _src;
     public:
-        ByteCastIter(shared_ptr<IPyIterator<TBSK_BYTE>>& ref_src) :_src{ref_src}
+        ByteCastIter(const shared_ptr<IPyIterator<TBSK_BYTE>>& ref_src) :_src{ref_src}
         {
         }
         int Next()override
@@ -21,7 +21,7 @@ namespace TBSKmodemCPP
     private:
         const shared_ptr<IPyIterator<char>> _src;
     public:
-        CharCastIter(shared_ptr<IPyIterator<char>>& ref_src) :_src{ ref_src }
+        CharCastIter(const shared_ptr<IPyIterator<char>>& ref_src) :_src{ ref_src }
         {
         }
         int Next()override
@@ -32,7 +32,7 @@ namespace TBSKmodemCPP
 
 
 
-    ByteStream::ByteStream(shared_ptr<IPyIterator<int>>&& src, int inital_pos):
+    ByteStream::ByteStream(const shared_ptr<IPyIterator<int>>& src, int inital_pos):
         _pos{ inital_pos },
         _iter{ src }
     {

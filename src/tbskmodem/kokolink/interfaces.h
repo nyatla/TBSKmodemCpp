@@ -98,7 +98,7 @@ namespace TBSKmodemCPP
         //         """
         //         pass
     public:
-        virtual IMPL& SetInput(const shared_ptr<S>&& src) = 0;
+        virtual IMPL& SetInput(const shared_ptr<S>& src) = 0;
 
         virtual ~IFilter() {}
     };
