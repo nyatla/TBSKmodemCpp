@@ -21,7 +21,7 @@ int main()
 		std::vector<int> bits{ 0,1,0,1,0,1,0,1 };
 		auto src = std::make_shared<PyIterator<int>>(bits);
 		auto a = std::make_shared<RoStream<int>>(src);
-		auto c = mod->ModulateAsBit(src);
+		auto c = mod->ModulateAsBit(a);
 		auto d = Functions::ToVector<double>(c);
 		FileWriter fw("./test2.wav");
 		PcmData pcm(d, 16, 8000);
