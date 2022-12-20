@@ -165,7 +165,7 @@ namespace TBSKmodemCPP
             v.ReadBytes(size, p.get());
         }
         catch (const BinaryReaderException& e) {
-            throw e;
+            throw;
         }
         auto r = this->WriteBytes(p.get(), size, padding);
         return r;

@@ -54,14 +54,14 @@ namespace TBSKmodemCPP
                 r.push(this->Next());
             }
         }
-        catch (RecoverableStopIteration e) {
-            throw e;
+        catch (RecoverableStopIteration&) {
+            throw;
             // self._savepoint=r
             // raise RecoverableStopIteration(e)
         }
-        catch (PyStopIteration e) {
+        catch (PyStopIteration&) {
             if (fillup || r.size() == 0) {
-                throw e;
+                throw;
             }
         }
         TBSK_ASSERT(r.size() < size);
@@ -77,11 +77,11 @@ namespace TBSKmodemCPP
         try {
             this->Gets(size, true);
         }
-        catch (RecoverableStopIteration e) {
-            throw e;
+        catch (RecoverableStopIteration&) {
+            throw;
         }
-        catch (PyStopIteration e) {
-            throw e;
+        catch (PyStopIteration&) {
+            throw;
         }
         return;
     }

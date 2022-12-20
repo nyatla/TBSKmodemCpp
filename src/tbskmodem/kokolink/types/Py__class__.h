@@ -119,7 +119,7 @@ namespace TBSKmodemCPP
                 {
                     return this->_current->Next();
                 }
-                catch (PyStopIteration)
+                catch (PyStopIteration&)
                 {   //値取得で失敗したらイテレーションの差し替え。
                     this->_current.reset();
                     continue;

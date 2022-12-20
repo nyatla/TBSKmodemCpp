@@ -23,7 +23,7 @@ namespace TBSKmodemCPP
                     ret->push_back((TBSK_BYTE)(d * 127 + 128));
                 }
             }
-            catch (PyStopIteration) {
+            catch (PyStopIteration&) {
                 //nothing to do
             }
             return ret;
@@ -48,7 +48,7 @@ namespace TBSKmodemCPP
                         ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
                     }
                 }
-            }catch (PyStopIteration) {
+            }catch (PyStopIteration&) {
                     //nothing to do
             }
             return ret;

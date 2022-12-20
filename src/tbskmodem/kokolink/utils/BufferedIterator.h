@@ -30,8 +30,8 @@ namespace TBSKmodemCPP
             try {
                 d = this->_src->Next();
             }
-            catch (RecoverableStopIteration e) {
-                throw e;
+            catch (RecoverableStopIteration&) {
+                throw;
             }
             this->_buf->Append(d);
             return d;

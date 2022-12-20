@@ -27,18 +27,18 @@ namespace TBSKmodemCPP
             try {
                 d = (unsigned)this->_src->Next();
             }
-            catch (RecoverableStopIteration e) {
+            catch (RecoverableStopIteration&) {
                 this->_bits = bits;
                 this->_n_bits = n_bits;
-                throw e;
+                throw;
             }
-            catch (PyStopIteration e) {
+            catch (PyStopIteration& e) {
                 this->_is_eos = true;
                 if (n_bits != 0) {
                     // # print("Fraction")
                     throw StopIteration_BitsWidthConvertIterator_FractionalBitsLeft(e);
                 }
-                throw PyStopIteration(e);
+                throw;
             }
             bits = (bits << this->_input_bits) | d;
             n_bits = n_bits + this->_input_bits;

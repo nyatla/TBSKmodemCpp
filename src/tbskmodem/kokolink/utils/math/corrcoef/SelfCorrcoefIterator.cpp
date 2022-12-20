@@ -57,9 +57,9 @@ namespace TBSKmodemCPP
         {
             vx = this->_srcx->Next();
         }
-        catch (RecoverableStopIteration e)
+        catch (RecoverableStopIteration&)
         {
-            throw e;
+            throw;
         }
 
 

@@ -14,8 +14,8 @@ namespace TBSKmodemCPP
         try {
             r = SumIterator::Next();
         }
-        catch (RecoverableStopIteration e) {
-            throw e;
+        catch (RecoverableStopIteration&) {
+            throw;
         }
         return r / this->_length;
     }

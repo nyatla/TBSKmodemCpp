@@ -4,6 +4,7 @@
 #include <vector>
 #include <cassert>
 
+
 namespace TBSKmodemCPP
 {
 	const static double TBSK_PI = 3.1415926535897932384626433832795;

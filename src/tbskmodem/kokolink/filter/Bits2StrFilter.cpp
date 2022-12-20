@@ -34,9 +34,9 @@ namespace TBSKmodemCPP
             {
                 d = this->_iter->Next();
             }
-            catch (RecoverableStopIteration e)
+            catch (RecoverableStopIteration& e)
             {
-                throw e;
+                throw;
             }
             this->_savedata.push_back((TBSK_BYTE)d);
             //try

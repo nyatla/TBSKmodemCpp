@@ -308,7 +308,7 @@ namespace TBSKmodemCPP
             try {
                 fp.ReadBytes(4, name);
             }
-            catch (const BinaryReaderException) {
+            catch (BinaryReaderException&) {
                 break;
             }
             int size;

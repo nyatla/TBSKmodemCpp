@@ -109,7 +109,7 @@ namespace TBSKmodemCPP
                     r->push_back(src->Next());
                 }
             }
-            catch(PyStopIteration) {
+            catch(PyStopIteration&) {
                 return r;
             }
             throw std::exception();

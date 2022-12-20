@@ -4,6 +4,7 @@
 #include "../../filter/BitsWidthFilter.h"
 #include "./preamble/CoffPreamble.h"
 #include <string.h>
+
 namespace TBSKmodemCPP
 {
 #pragma warning( disable : 4250 )
@@ -39,10 +40,10 @@ namespace TBSKmodemCPP
             {
                 n = this->_src->Next();
             }
-            catch (PyStopIteration e)
+            catch (PyStopIteration&)
             {
                 this->_is_eos = true;
-                throw PyStopIteration(e);
+                throw;
             }
             if (n == 1)
             {
@@ -211,6 +212,7 @@ namespace TBSKmodemCPP
                     return false;
                 }
             }
+
             if (this->_co_step == 1)
             {
                 if (!this->_wsrex->Run()) {
@@ -252,12 +254,12 @@ namespace TBSKmodemCPP
                     return true;
 
                 }
-                catch (RecoverableStopIteration)
+                catch (RecoverableStopIteration&)
                 {
                     return false;
 
                 }
-                catch (PyStopIteration)
+                catch (PyStopIteration&)
                 {
                     TBSK_ASSERT(this->_result == NULL);
                     this->Close();
@@ -320,11 +322,9 @@ namespace TBSKmodemCPP
     };
 
 
-
     shared_ptr<IPyIterator<int>> TbskDemodulator::DemodulateAsBit(const shared_ptr<IPyIterator<double>>& src)
     {
         TBSK_ASSERT(!this->_asmethod_lock);
-
         auto asmethod = make_shared<DemodulateAsBitAS_impl>(*this,src);
         if (asmethod->Run())
         {   

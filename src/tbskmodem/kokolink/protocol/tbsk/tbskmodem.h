@@ -85,7 +85,7 @@ namespace TBSKmodemCPP
 
 
         //    """ TBSK信号からnビットのint値配列を復元します。
-        //        関数は信号を検知する迄制御を返しません。信号を検知せずにストリームが終了した場合はNoneを返します。
+        //        関数は信号を検知する迄制御を返しません。信号を検知せずにストリームが終了した場合は空のシェアドポインタを返します。
         //    """
         shared_ptr<IPyIterator<int>> DemodulateAsInt(const shared_ptr<IPyIterator<double>>& src, int bitwidth = 8);
 

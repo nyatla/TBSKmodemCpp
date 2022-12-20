@@ -53,9 +53,9 @@ namespace TBSKmodemCPP
                     }
                 }
             }
-            catch (PyStopIteration e) {
+            catch (PyStopIteration&) {
                 this->_is_eos = true;
-                throw e;
+                throw;
             }
         }
         auto r = this->_tone_q.front();
@@ -218,12 +218,12 @@ namespace TBSKmodemCPP
                 throw PyStopIteration();
             }
         }
-        catch (RecoverableStopIteration e) {
-            throw e;
+        catch (RecoverableStopIteration&) {
+            throw;
         }
-        catch (PyStopIteration e) {
+        catch (PyStopIteration&) {
             this->_is_eos = true;
-            throw e;
+            throw;
         }
     }
     // @property

@@ -9,6 +9,7 @@
 #include "../../../utils/BufferedIterator.h"
 #include "../../../utils/RingBuffer.h"
 
+
 namespace TBSKmodemCPP
 {
     using std::make_shared;
@@ -163,7 +164,6 @@ namespace TBSKmodemCPP
                     {
                         while (true)
                         {
-
                             try
                             {
                                 rb->Append(avi->Next());
@@ -184,10 +184,10 @@ namespace TBSKmodemCPP
                                 }
                                 break;
                             }
-                            catch (RecoverableStopIteration)
+                            catch (RecoverableStopIteration&)
                             {
                                 return false;
-                            }
+                            }   
                         }
                         this->_co_step = 2; //#Co進行
                     }
@@ -210,7 +210,7 @@ namespace TBSKmodemCPP
                                 }
                                 break;
                             }
-                            catch (RecoverableStopIteration)
+                            catch (RecoverableStopIteration&)
                             {
                                 return false;
                             }
@@ -245,7 +245,7 @@ namespace TBSKmodemCPP
                                     break;
                                 }
                             }
-                            catch (RecoverableStopIteration)
+                            catch (RecoverableStopIteration&)
                             {
                                 return false;
                             }
@@ -335,14 +335,14 @@ namespace TBSKmodemCPP
                     throw std::runtime_error("Invalid co_step");
                 }
             }
-            catch (PyStopIteration) {
+            catch (PyStopIteration&) {
                 this->_co_step = 4; //#end
                 this->Close();
                 this->_result.set();
                 return true;
                 //# print("END")
             }
-            catch (std::exception) {
+            catch (...) {
                 this->_co_step = 4; //#end
                 this->Close();
                 throw;

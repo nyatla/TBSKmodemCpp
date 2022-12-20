@@ -1,4 +1,5 @@
 #include "SumIterator.h"
+
 namespace TBSKmodemCPP
 {
 
@@ -18,11 +19,13 @@ namespace TBSKmodemCPP
 
 
 
+
+
     double SumIterator::Next()
     {
-        auto s=this->_src->Next();
-        auto d=this->_buf->Append(s);
-        this->_sum=this->_sum+s-d;
+        auto s = this->_src->Next();
+        auto d = this->_buf->Append(s);
+        this->_sum = this->_sum + s - d;
         // # self._num_of_input=self._num_of_input+1
         return this->_sum;
     }

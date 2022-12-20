@@ -21,8 +21,8 @@ namespace TBSKmodemCPP
         try {
             r = this->_bw->Next();
         }
-        catch (RecoverableStopIteration e) {
-            throw e;
+        catch (RecoverableStopIteration&) {
+            throw;
         }
         this->_pos = this->_pos + 1;
         return r;
