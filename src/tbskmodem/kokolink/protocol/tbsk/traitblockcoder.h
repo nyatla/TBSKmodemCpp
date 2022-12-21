@@ -6,8 +6,9 @@
 #include "../../utils/SumIterator.h"
 #include "../../types/types.h"
 #include "../../utils/math/corrcoef/SelfCorrcoefIterator.h"
-#include <queue>
+#include <deque>
 #include <cmath>
+
 
 
 namespace TBSKmodemCPP
@@ -24,7 +25,7 @@ namespace TBSKmodemCPP
         const shared_ptr<const TraitTone> _btone;
         TBSK_INT64 _pos;
         vector<int> _sblock;
-        queue<double> _tone_q;
+        std::deque<double> _tone_q;
         shared_ptr<IBitStream> _src;
         bool _is_eos;
 

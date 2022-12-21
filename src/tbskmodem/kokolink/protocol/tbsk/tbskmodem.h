@@ -31,7 +31,7 @@ namespace TBSKmodemCPP
         const shared_ptr<const TraitTone> _tone;
         const shared_ptr<const Preamble> _preamble;
 
-        const unique_ptr<TraitBlockEncoder> _enc;
+        const shared_ptr<TraitBlockEncoder> _enc;
     public:
         TbskModulator(const shared_ptr<const TraitTone>& tone);
 

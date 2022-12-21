@@ -2,7 +2,12 @@
 #include "../../utils/SumIterator.h"
 #include "../../utils/AverageInterator.h"
 
-
+extern "C" {
+    //extern void dbgprint(int);
+    //void dbgprint(int v) {
+    //    printf("%d\n", v);
+    //}
+}
 namespace TBSKmodemCPP
 {
     using std::make_shared;
@@ -31,7 +36,7 @@ namespace TBSKmodemCPP
     {
         this->_is_eos = false;//True if src is None else False
         //this->_tone_q->Clear();//=new Queue<float>();
-        queue<double> empty;   this->_tone_q.swap(empty);//キューのクリア
+        std::deque<double> empty;   this->_tone_q.swap(empty);//キューのクリア
         // # print(len(self._tone_q))
         this->_pos = 0;
         this->_src = src;
@@ -47,9 +52,10 @@ namespace TBSKmodemCPP
             try {
                 auto sign = this->_src->Next() != 0 ? 1 : -1;//1 if next(self._src)!=0 else -1
                 const TraitTone* btone = this->_btone.get();
+
                 for (auto i : this->_sblock) {
                     for (auto j : *btone) {
-                        this->_tone_q.push(sign * i * j);
+                        this->_tone_q.push_back(sign * i * j);
                     }
                 }
             }
@@ -59,7 +65,7 @@ namespace TBSKmodemCPP
             }
         }
         auto r = this->_tone_q.front();
-        this->_tone_q.pop();
+        this->_tone_q.pop_front();
         this->_pos += 1; //#posのインクリメント
         return r;
     }

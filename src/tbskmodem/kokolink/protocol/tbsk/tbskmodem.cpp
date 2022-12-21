@@ -89,7 +89,7 @@ namespace TBSKmodemCPP
     TbskModulator::TbskModulator(const shared_ptr<const TraitTone>& tone, const shared_ptr<const Preamble>& preamble) :
         _tone{ tone },
         _preamble{ preamble },
-        _enc{ make_unique<TraitBlockEncoder>(tone) }
+        _enc{ make_shared<TraitBlockEncoder>(tone) }
     {
     }
     TbskModulator::~TbskModulator() {
@@ -99,7 +99,7 @@ namespace TBSKmodemCPP
     {
         auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
 
-        auto tbe = make_shared<TraitBlockEncoder>(this->_tone);
+        auto& tbe = this->_enc;
         tbe->SetInput(make_shared<DiffBitEncoder>(0, src));
         vector <shared_ptr<IPyIterator<double>>> d{
             this->_preamble->GetPreamble(),
