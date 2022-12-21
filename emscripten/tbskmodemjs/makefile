@@ -40,7 +40,7 @@ clean:
 
 
 $(PATH_OUTPUT)/$(NAME_APP):$(TARGET_FILES)
-	$(CC) -o $(PATH_OUTPUT)/$(NAME_APP)  $(TARGETS) ../libtbskmodem/libtbskmodem.a
+	$(CC) -O0 -o $(PATH_OUTPUT)/$(NAME_APP)  $(FLGS) $(TARGETS) ../libtbskmodem/libtbskmodem.a --js-library ./src/jsfunctions.js
 
 $(TARGET_FILES):$(SOURCES);mkdir -p $(PATH_OBJECT)
 	$(CC) $(FLGS)  -s NO_EXIT_RUNTIME=1 \

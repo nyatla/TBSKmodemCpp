@@ -1,33 +1,45 @@
 #pragma once
 #include "../../../src/tbskmodem/tbskmodem.h"
 #include <memory>
-#include <vector>
+#include <array>
 
 using namespace TBSKmodemCPP;
 
 class PointerHolder
 {
 private:
-    std::vector<shared_ptr<void>> _buf;
+    std::array<shared_ptr<void>,100> _buf;
 public:
     //リストにインスタンスを加える。
-    void* Add(const shared_ptr<void>&& v) {
-        this->_buf.push_back(v);
-        return &this->_buf[this->_buf.size() - 1];
+    // @return 現在の参照数
+    void* Add(const shared_ptr<void>& v) {
+        for (auto i = 0;i < this->_buf.size();i++) {
+            if (!this->_buf[i]) {
+                this->_buf[i]=v;
+                return &this->_buf[i];
+            }
+        }
+        throw std::overflow_error("Pointer holder full.");
     }
 
     //リストからインスタンスを取り除く
     void Remove(void* ptr) {
         for (auto i = 0;i < this->_buf.size();i++) {
             if (&this->_buf[i] == ptr) {
-                this->_buf.erase(std::cbegin(this->_buf) + i);
-                break;
+                this->_buf[i].reset();
+                return;
             }
         }
-        return;
+        throw std::runtime_error("Invalid ptr.");
     }
-    //リストのサイズを返す
+    //割り当て済の数を返す。
     int Size(){
-        return this->_buf.size();
+        auto s = 0;
+        for (auto i = 0;i < this->_buf.size();i++) {
+            if (this->_buf[i]) {
+                s = s + 1;
+            }
+        }
+        return s;
     }
 };

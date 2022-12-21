@@ -30,13 +30,130 @@ template<typename T> struct PyIteratorWrapper {
     shared_ptr<IPyIterator<T>> ptr;
 };
 
+
+
+//  JSからWASMに転送するためのIter. Recoverable選択可能。
+//
+template<typename T> class InputIterator :public NoneCopyConstructor_class, public virtual IPyIterator <T> {
+private:
+    bool _recoverable;
+    T _last_next;
+    std::queue<T> _q;
+    bool _closed;
+public:
+    InputIterator(bool recoveable = false) :_closed{ false }, _recoverable{ recoveable }
+    {
+    }
+    int Put(T v)
+    {
+        this->_q.push(v);
+        return this->_q.size();
+    }
+    void Close() {
+        this->_closed = true;
+    }
+    //C++向けAPI
+    T Next()
+    {
+        if (this->_closed) {
+            throw PyStopIteration();
+        }
+        if (this->_q.empty()) {
+            if (this->_recoverable) {
+                throw RecoverableStopIteration();
+            }
+            this->_closed = true;
+            throw PyStopIteration();
+        }
+        auto r=this->_q.front();
+        this->_q.pop();
+        return r;
+    }
+};
+
+
+//  JSからWASMのイテレータを参照するためのもの。
+//
+template<typename T> class OutputIterator :public NoneCopyConstructor_class
+{
+private:
+    const shared_ptr<IPyIterator<T>> _src;
+    T _last_next;
+public:
+    OutputIterator(const shared_ptr<IPyIterator<T>>& src) :_src{ src }, _last_next{0}
+    {
+    }
+    //Nextの実行結果を返します。
+    //Nextの返す値はlast_nextで取得できます。
+    int hasNext() {
+        try {
+            auto r = this->_src->Next();
+            this->_last_next = r;
+            return 0;
+        }
+        catch (RecoverableStopIteration) {
+            return 1;
+        }
+        catch (PyStopIteration) {
+            return 2;
+        }
+    }
+    T lastNext() {
+        return this->_last_next;
+    }
+};
+
+template class OutputIterator<int>;
+template class OutputIterator<double>;
+
+
 #ifdef __cplusplus
-extern "C" {
+#define EXTERN_C extern "C"
+#else
+#define EXTERN_C
 #endif
 
 
 
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    EM_JS(void, dbgprint2, (int num), {
+        console.log("dbgprint:"+num);
+    });
+    void dbgprint(int num) {
+        dbgprint2(num);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  RawMemory走査関数
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_malloc(int size)
+    {
+        return malloc(size);
+    }
+    void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_free(void* ptr)
+    {
+        free(ptr);
+    }
+    void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_putInt(void* ptr, int pos, int v)
+    {
+        *((int*)ptr + pos) = v;
+    }
+    int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_getInt(void* ptr, int pos)
+    {
+        return *((int*)ptr + pos);
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  SharedMemoryオブジェクト管理関数
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //ポインタテーブルのサイズを返す。
     int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PointerHolder_Size()
@@ -44,67 +161,123 @@ extern "C" {
         return _instances.Size();
     }
 
-    
-
+    //ポインタテーブルからインスタンスを削除。エラーの場合-1
     void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_Dispose(void* ptr)
     {
         _instances.Remove(ptr);
     }
+#ifdef __cplusplus
+}
+#endif
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+    //  入出力補助関数
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    EXTERN_C shared_ptr<InputIterator<int>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IntInputIterator() {
+        auto r = std::make_shared<InputIterator<int>>();
+        return (shared_ptr<InputIterator<int>>*)_instances.Add(r);
+    }
+    EXTERN_C void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IntInputIterator_put(const shared_ptr<InputIterator<int>>* ptr, int v)
+    {
+        (*ptr)->Put(v);
+    }
+
+    EXTERN_C shared_ptr<InputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator() {
+        auto r = std::make_shared<InputIterator<double>>();
+        return (shared_ptr<InputIterator<double>>*)_instances.Add(r);
+    }
+    EXTERN_C void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator_put(const shared_ptr<InputIterator<double>>* ptr, double v)
+    {
+        (*ptr)->Put(v);
+    }
+
+    //EXTERN_C shared_ptr<OutputIterator<int>>* new_IntOutputIterator(const shared_ptr<IPyIterator<int>>& src) {
+    //    auto r = std::make_shared<OutputIterator<int>>(src);
+    //    return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
+    //}
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IntOutputIterator_hasNext(const shared_ptr<OutputIterator<int>>* ptr)
+    {
+        return (*ptr)->hasNext();
+    }
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IntOutputIterator_lastNext(const shared_ptr<OutputIterator<int>>* ptr)
+    {
+        return (*ptr)->lastNext();
+    }
+
+    //EXTERN_C shared_ptr<OutputIterator<double>>* new_DoubleOutputIterator(const shared_ptr<IPyIterator<double>>& src) {
+    //    auto r = std::make_shared<OutputIterator<double>>(src);
+    //    return (shared_ptr<OutputIterator<double>>*)_instances.Add(r);
+    //}
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleOutputIterator_hasNext(const shared_ptr<OutputIterator<double>>* ptr)
+    {
+        return (*ptr)->hasNext();
+    }
+    EXTERN_C double EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleOutputIterator_lastNext(const shared_ptr<OutputIterator<double>>* ptr)
+    {
+        return (*ptr)->lastNext();
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////
+    //  TBSKmodemクラス
+    //////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-
-    void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TraitTone(const double* data, int length) {
+    EXTERN_C void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TraitTone(const double* data, int length) {
         auto r = std::make_shared<TraitTone>();
         for (auto i = 0;i < length;i++) {
             r->push_back(*(data + i));
         }
         return _instances.Add(r);
     }
-    void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_SinTone(int points,int cycle) {
-        auto r = std::make_shared<SinTone>(points,cycle);
+    EXTERN_C void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_SinTone(int points, int cycle) {
+        auto r = std::make_shared<SinTone>(points, cycle);
         return _instances.Add(r);
     }
-    void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_XPskSinTone(int points,int cycle,int div) {
-        auto r = std::make_shared<XPskSinTone>(points, cycle,div);
+    EXTERN_C void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_XPskSinTone(int points, int cycle, int div) {
+        auto r = std::make_shared<XPskSinTone>(points, cycle, div);
         return _instances.Add(r);
     }
 
-
-    void* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_CoffPreamble(void* tone_ptr) {
-        const shared_ptr<TraitTone>* tone = (const shared_ptr<TraitTone>*)(tone_ptr);
-        auto r = std::make_shared<CoffPreamble>(*tone);
-        return _instances.Add(r);
+    EXTERN_C shared_ptr<CoffPreamble>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_CoffPreamble(const shared_ptr<TraitTone>* tone, double threshold, int cycle) {
+        auto r = std::make_shared<CoffPreamble>(*tone,threshold,cycle);
+        return (shared_ptr<CoffPreamble>*)_instances.Add(r);
     }
+
+
+
 
     //
     //  TbskModulator
     //
 
-    shared_ptr<TbskModulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator(const shared_ptr<TraitTone>* tone_ptr, const shared_ptr<Preamble>* preamble_ptr)
+    EXTERN_C shared_ptr<TbskModulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator(const shared_ptr<TraitTone>* tone, const shared_ptr<Preamble>* preamble)
     {
         //tone,preambleを生成
-
-        auto r = std::make_shared<TbskModulator>(*tone_ptr, *preamble_ptr);
+        auto r = std::make_shared<TbskModulator>(*tone, *preamble);
         return (shared_ptr<TbskModulator>*)_instances.Add(r);
     }
 
-
-
-
-    shared_ptr<struct PyIteratorWrapper<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_Modulate(shared_ptr<TbskModulator>* ptr, shared_ptr<IPyIterator<int>>* src_ptr) {
-        shared_ptr<TbskModulator>& ref = *ptr;
-        shared_ptr<IPyIterator<int>>&  src_ref= *src_ptr;
-        
-        auto r=make_shared<struct PyIteratorWrapper<double>>();
-        r->ptr= ref->Modulate(std::move(src_ref), 0);
-        r->last_value = 0;
-        return (shared_ptr<struct PyIteratorWrapper<double>>*)_instances.Add(r);
+    EXTERN_C shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_Modulate_A(const shared_ptr<TbskModulator>* ptr, const shared_ptr<InputIterator<int>>* src)
+    {
+        const shared_ptr<TbskModulator>& ref = *ptr;
+        auto m = ref->Modulate((*src));//例外を吐くなら注意!
+        auto r = std::make_shared<OutputIterator<double>>(m);
+        return (shared_ptr<OutputIterator<double>>*)_instances.Add(r);
     }
 
 
-    shared_ptr<TbskDemodulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator(const shared_ptr<TraitTone>* tone_ptr, const shared_ptr<Preamble>* preamble_ptr)
+
+    //
+    //  TbskDemodulator
+    //
+
+
+
+    EXTERN_C shared_ptr<TbskDemodulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator(const shared_ptr<TraitTone>* tone_ptr, const shared_ptr<Preamble>* preamble_ptr)
     {
         //tone,preambleを生成
 
@@ -112,59 +285,29 @@ extern "C" {
         return (shared_ptr<TbskDemodulator>*)_instances.Add(r);
     }
 
-    void wasm_tbskmodem_TbskDemodulator_DemodulateAsInt(shared_ptr<IPyIterator<double>>* src_ptr){
-    }
-    /*************************************************************
-        wasm_tbskmodem_IPyIterator
-     *************************************************************/
 
-    //  戻り値はイテレータのステータス。
-    //  0:
-    //  1:
-    //  2:
-    //
-    int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IPyIterator_double_next(shared_ptr<struct PyIteratorWrapper<double>>* ptr)
-    {
+
+
+
+    EXTERN_C shared_ptr<OutputIterator<int>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_DemodulateAsInt(const shared_ptr<TbskDemodulator>* ptr, const shared_ptr<InputIterator<double>>* src) {
+        const shared_ptr<TbskDemodulator>& ref = *ptr;
         try {
-            auto v = (*ptr)->ptr->Next();
-            (*ptr)->last_value = v;
-            return 1;
+            shared_ptr<IPyIterator<int>> m = (*ptr)->DemodulateAsInt(*src);//例外トラップ機構が変
+            if (!m) {
+                //未割当ならnull
+                return NULL;
+            }
+            auto r = std::make_shared<OutputIterator<int>>(m);
+            return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
         }
-        catch (RecoverableStopIteration) {
-            (*ptr)->last_value = 0;
-            return 2;   //一時中断
+        catch (RecoverableException<DemodulateAsBitAS>& e) {
+            e.Close();
+            return NULL;
         }
-        catch (PyStopIteration) {
-            (*ptr)->last_value = 0;
-            return 3;   //終端
+        catch (...) {
+            return NULL;
         }
-    }
-    double EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IPyIterator_double_value(shared_ptr<struct PyIteratorWrapper<double>>* ptr)
-    {
-        return (*ptr)->last_value;
-    }
 
-
-    int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IPyIterator_int_next(shared_ptr<struct PyIteratorWrapper<int>>* ptr)
-    {
-        try {
-            auto v = (*ptr)->ptr->Next();
-            (*ptr)->last_value = v;
-            return 1;
-        }
-        catch (RecoverableStopIteration) {
-            (*ptr)->last_value = 0;
-            return 2;   //一時中断
-        }
-        catch (PyStopIteration) {
-            (*ptr)->last_value = 0;
-            return 3;   //終端
-        }
-    }
-
-    int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IPyIterator_int_value(shared_ptr<struct PyIteratorWrapper<double>>* ptr)
-    {
-        return (*ptr)->last_value;
     }
 
 
@@ -172,24 +315,24 @@ extern "C" {
 
 
 
-    shared_ptr<PcmData>* wasm_tbskmodem_PcmData_1(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate) {
+    EXTERN_C shared_ptr<PcmData>* wasm_tbskmodem_PcmData_1(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate) {
         return (shared_ptr<PcmData>*)_instances.Add(make_shared<PcmData>(src, size, sample_bits, frame_rate));
     }
 
 
 
-    int wasm_tbskmodem_PcmData_GetSampleBits(const shared_ptr<PcmData>* ptr)
+    EXTERN_C int wasm_tbskmodem_PcmData_GetSampleBits(const shared_ptr<PcmData>* ptr)
     {
         return (*ptr)->GetSampleBits();
     };
-    int wasm_tbskmodem_GetFramerate(const shared_ptr<PcmData>* ptr)
+    EXTERN_C int wasm_tbskmodem_GetFramerate(const shared_ptr<PcmData>* ptr)
     {
         return (*ptr)->GetFramerate();
     }
-    int wasm_tbskmodem_GetByteslen(const shared_ptr<PcmData>* ptr) {
+    EXTERN_C int wasm_tbskmodem_GetByteslen(const shared_ptr<PcmData>* ptr) {
         return (*ptr)->GetByteslen();
     }
-    const int wasm_tbskmodem_DataAsFloat(const shared_ptr<PcmData>* ptr, double* buf, int buf_len_in_bytes) {
+    EXTERN_C const int wasm_tbskmodem_DataAsFloat(const shared_ptr<PcmData>* ptr, double* buf, int buf_len_in_bytes) {
         auto& r = (*ptr)->DataAsFloat();
         auto tick_count = (*ptr)->GetByteslen() / ((*ptr)->GetSampleBits() / 8);
         if (buf_len_in_bytes < r->size() * sizeof(double) * tick_count) {
@@ -200,34 +343,8 @@ extern "C" {
     }
 
 
-#ifdef __cplusplus
-}
-#endif
-
-EM_JS(int, JsIntProvider_next_handler, (int handle), {
-let r = _TBSKmodemJS._callback_handler(handle);
-return r;
-});
 
 
-
-class JsIntProvider :public IPyIterator<int> {
-private:
-    int _handle=0;
-    int count = 3;
-public:
-    JsIntProvider(){}
-    void setHandle(int h) {
-        this->_handle = h;
-    }
-    int Next(){
-        int p1 = JsIntProvider_next_handler(this->_handle);
-        if (this->count > 0) {
-            return 1;
-        }
-        throw PyStopIteration();
-    }
-};
 
 
 #ifdef __cplusplus
@@ -235,13 +352,18 @@ extern "C" {
 #endif
 
 
-    shared_ptr<JsIntProvider>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_JsIntProvider() {
-        return (shared_ptr<JsIntProvider>*)_instances.Add(make_shared<JsIntProvider>());
-    }
-    void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_JsIntProvider_setHandle(shared_ptr<JsIntProvider>* ptr,int handle) {
-        (*ptr)->setHandle(handle);
+
+    extern void TBSKmodemJS_init();
+    void EMSCRIPTEN_KEEPALIVE TBSKmodemJS() {
+        TBSKmodemJS_init();
     }
 
 #ifdef __cplusplus
 }
 #endif
+
+
+//int main()
+//{
+//    TBSKmodemJS_init();
+//}
