@@ -87,6 +87,10 @@ public:
     //Nextの返す値はlast_nextで取得できます。
     int hasNext() {
         try {
+            if (!this->_src) {
+                //emptyならstopiteration扱い
+                return 1;
+            }
             auto r = this->_src->Next();
             this->_last_next = r;
             return 0;
@@ -102,9 +106,6 @@ public:
         return this->_last_next;
     }
 };
-
-template class OutputIterator<int>;
-template class OutputIterator<double>;
 
 
 #ifdef __cplusplus
@@ -183,8 +184,8 @@ extern "C" {
         (*ptr)->Put(v);
     }
 
-    EXTERN_C shared_ptr<InputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator() {
-        auto r = std::make_shared<InputIterator<double>>();
+    EXTERN_C shared_ptr<InputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator(bool recoveable=false) {
+        auto r = std::make_shared<InputIterator<double>>(recoveable);
         return (shared_ptr<InputIterator<double>>*)_instances.Add(r);
     }
     EXTERN_C void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator_put(const shared_ptr<InputIterator<double>>* ptr, double v)
@@ -260,7 +261,9 @@ extern "C" {
         auto r = std::make_shared<TbskModulator>(*tone, *preamble);
         return (shared_ptr<TbskModulator>*)_instances.Add(r);
     }
-
+    /**
+    *   戻り値はdisposeする必要があります。
+    */
     EXTERN_C shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_Modulate_A(const shared_ptr<TbskModulator>* ptr, const shared_ptr<InputIterator<int>>* src)
     {
         const shared_ptr<TbskModulator>& ref = *ptr;
@@ -288,15 +291,17 @@ extern "C" {
 
 
 
-
+    /** 
+    *   非NULLの場合、有効な戻り値イテレータ。
+    *   NULLの場合、終端までに信号を検出できなかった。
+    * 
+    *   戻り値はdisposeする必要があります。
+    */
     EXTERN_C shared_ptr<OutputIterator<int>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_DemodulateAsInt(const shared_ptr<TbskDemodulator>* ptr, const shared_ptr<InputIterator<double>>* src) {
         const shared_ptr<TbskDemodulator>& ref = *ptr;
         try {
-            shared_ptr<IPyIterator<int>> m = (*ptr)->DemodulateAsInt(*src);//例外トラップ機構が変
-            if (!m) {
-                //未割当ならnull
-                return NULL;
-            }
+            shared_ptr<IPyIterator<int>> m = (*ptr)->DemodulateAsInt(*src);
+            //mは未割当の場合もある。(終端到達で未検出)OutputIterator側でチェックする事！
             auto r = std::make_shared<OutputIterator<int>>(m);
             return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
         }
@@ -307,8 +312,79 @@ extern "C" {
         catch (...) {
             return NULL;
         }
-
     }
+
+
+
+    struct DemodulateResult{
+        int type;
+        shared_ptr<IPyIterator<int>> iter;
+        shared_ptr<DemodulateAsIntAS> recover;
+        void setIPyIterator(const shared_ptr<IPyIterator<int>>& v) {
+            this->type = 1;
+            this->iter= v;
+        }
+        void setDemodulateResult(const shared_ptr<DemodulateAsIntAS>& v) {
+            this->type = 2;
+            this->recover = v;
+        }
+    };
+
+   /**
+    *   特殊戻り値で複数の値を返します。
+    *   戻り値はdisposeする必要があります。
+    */
+    EXTERN_C shared_ptr<struct DemodulateResult>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_DemodulateAsInt_B(const shared_ptr<TbskDemodulator>* ptr, const shared_ptr<InputIterator<double>>* src) {
+        const shared_ptr<TbskDemodulator>& ref = *ptr;
+        try {
+            //未検出、または検出の場合
+            shared_ptr<IPyIterator<int>> m = (*ptr)->DemodulateAsInt(*src);//例外トラップ
+            //mは未割当の場合もある。(終端到達で未検出)OutputIterator側でチェックする事！
+
+            auto r = std::make_shared<struct DemodulateResult>();
+            r->setIPyIterator(m);
+            return (shared_ptr<struct DemodulateResult>*)_instances.Add(r);
+        }
+        catch (RecoverableException<DemodulateAsIntAS>& e) {
+            //ストリームの中断を検知した場合
+            auto r = std::make_shared<struct DemodulateResult>();
+            r->setDemodulateResult(e.Detach());
+            return (shared_ptr<struct DemodulateResult>*)_instances.Add(r);
+        }
+        catch (...) {
+            return NULL;
+        }
+    }
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_DemodulateResult_GetType(const shared_ptr<struct DemodulateResult>* ptr) {
+        return (*ptr)->type;
+    }
+
+    /**
+    *   Resultがoutputであればその値を返します。
+    *   戻り値はdisposeする必要があります。
+    */
+    EXTERN_C shared_ptr<OutputIterator<int>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_DemodulateResult_GetOutput(const shared_ptr<struct DemodulateResult>* ptr, const shared_ptr<InputIterator<double>>* src) {
+        assert((*ptr)->type==1);
+        const auto& p = (*ptr)->iter;
+        auto r = std::make_shared<OutputIterator<int>>(p);
+        return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
+    }
+    /**
+    *   Resultがrecoverbleであれば実行してその結果を返します。
+    *   戻り値はdisposeする必要があります。
+    */
+    EXTERN_C shared_ptr<OutputIterator<int>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_DemodulateResult_Recover(const shared_ptr<struct DemodulateResult>* ptr)
+    {
+        assert((*ptr)->type == 2);
+        const auto& p = (*ptr)->recover;
+        if (p->Run()) {
+            auto r = std::make_shared<OutputIterator<int>>(p->GetResult());
+            return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
+        }
+        return NULL;
+    }
+
+
 
 
 

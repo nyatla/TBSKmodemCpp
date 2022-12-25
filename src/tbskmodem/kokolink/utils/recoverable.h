@@ -37,7 +37,7 @@ namespace TBSKmodemCPP
         // """ 関数を再試行します。再試行可能な状態で失敗した場合は、自分自信を返します。
         // """
     private:
-        const shared_ptr<ASYNC_METHOD> _recover_instance;
+        shared_ptr<ASYNC_METHOD> _recover_instance;
         RecoverableException() = delete;
     public:
         RecoverableException(const shared_ptr<ASYNC_METHOD>& recover_instance) : _recover_instance{ recover_instance }{}
@@ -45,10 +45,14 @@ namespace TBSKmodemCPP
             this->Close();
         }
         virtual void Close() {
-            this->_recover_instance->Close();
+            if (this->_recover_instance) {
+                this->_recover_instance->Close();
+            }
         }
         shared_ptr<ASYNC_METHOD> Detach() {
-            return std::move(this->_recover_instance);
+            auto a= this->_recover_instance;
+            this->_recover_instance.reset();
+            return a;
         }
     };
 

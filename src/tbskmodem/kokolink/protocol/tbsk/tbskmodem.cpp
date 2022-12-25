@@ -361,22 +361,22 @@ namespace TBSKmodemCPP
 
 
     //    """ TBSK信号からnビットのint値配列を復元します。
-    //        関数は信号を検知する迄制御を返しません。信号を検知せずにストリームが終了した場合はNoneを返します。
+    //        関数は信号を検知する迄制御を返しません。信号を検知せずにストリームが終了した場合はemptyのshared_ptrを返します。
     //    """
     shared_ptr<IPyIterator<int>> TbskDemodulator::DemodulateAsInt(const shared_ptr<IPyIterator<double>>& src, int bitwidth)
     {
         TBSK_ASSERT(!this->_asmethod_lock);
-        class CreateResult :public ICreateResult<int> {
-            const int _bitwidth;
-        public:
-            CreateResult(int bitwidth) : _bitwidth(bitwidth) {}
-            shared_ptr<IPyIterator<int>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const override
-            {
-                auto bwf = make_shared<BitsWidthFilter>(1, this->_bitwidth);
-                bwf->SetInput(src);
-                return bwf;
-            };
-        };
+        //class CreateResult :public ICreateResult<int> {
+        //    const int _bitwidth;
+        //public:
+        //    CreateResult(int bitwidth) : _bitwidth(bitwidth) {}
+        //    shared_ptr<IPyIterator<int>> _CreateResult(const shared_ptr<TraitBlockDecoder>& src)const override
+        //    {
+        //        auto bwf = make_shared<BitsWidthFilter>(1, this->_bitwidth);
+        //        bwf->SetInput(src);
+        //        return bwf;
+        //    };
+        //};
             
         auto asmethod = make_shared<DemodulateAsIntAS_impl>(*this, src,bitwidth);
         if (asmethod->Run())
