@@ -50,7 +50,8 @@ namespace TBSKmodemCPP
     {
         queue<T>& r = this->_savepoint;
         try {
-            for (auto i = 0;i < size - r.size();i++) {
+            const auto len = size - r.size();
+            for (auto i = 0;i < len;i++) {
                 r.push(this->Next());
             }
         }
@@ -64,7 +65,7 @@ namespace TBSKmodemCPP
                 throw;
             }
         }
-        TBSK_ASSERT(r.size() < size);
+        TBSK_ASSERT(r.size() <= size);
         auto ret = make_unique<vector<T>>();
         while (r.size() > 0) {
             ret->push_back(r.front());

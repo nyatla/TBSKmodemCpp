@@ -4,6 +4,7 @@
 #include "../../filter/BitsWidthFilter.h"
 #include "./preamble/CoffPreamble.h"
 #include <string.h>
+#include "../../cpp_debug.h"
 
 namespace TBSKmodemCPP
 {

@@ -1,13 +1,9 @@
 #include "./traitblockcoder.h"
 #include "../../utils/SumIterator.h"
 #include "../../utils/AverageInterator.h"
+#include "../../cpp_debug.h"
 
-extern "C" {
-    //extern void dbgprint(int);
-    //void dbgprint(int v) {
-    //    printf("%d\n", v);
-    //}
-}
+
 namespace TBSKmodemCPP
 {
     using std::make_shared;
