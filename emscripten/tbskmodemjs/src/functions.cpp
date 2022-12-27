@@ -58,7 +58,7 @@ public:
         if (this->_closed) {
             throw PyStopIteration();
         }
-        if (this->_q.empty()) {
+        if (this->_q.size()==0) {
             if (this->_recoverable) {
                 throw RecoverableStopIteration();
             }
@@ -68,6 +68,18 @@ public:
         auto r=this->_q.front();
         this->_q.pop();
         return r;
+    }
+    std::shared_ptr<std::vector<T>> ToVector() {
+        auto ret=std::make_shared<std::vector<T>>();
+        try {
+            for (;;) {
+                ret->push_back(this->Next());
+            }
+        }
+        catch (PyStopIteration&) {
+            //nothsing to do
+        }
+        return ret;
     }
 };
 
@@ -89,16 +101,19 @@ public:
         try {
             if (!this->_src) {
                 //emptyならstopiteration扱い
+                EM_ASM({ console.log("RECNULL") });
                 return 1;
             }
             auto r = this->_src->Next();
             this->_last_next = r;
             return 0;
         }
-        catch (RecoverableStopIteration) {
+        catch (RecoverableStopIteration&) {
+            EM_ASM({console.log("RECOVER")});
             return 1;
         }
-        catch (PyStopIteration) {
+        catch (PyStopIteration&) {
+            EM_ASM({ console.log("STOP") });
             return 2;
         }
     }
@@ -122,12 +137,8 @@ public:
 extern "C" {
 #endif
 
-    EM_JS(void, dbgprint2, (int num), {
-        console.log("dbgprint:"+num);
-    });
-    void dbgprint(int num) {
-        dbgprint2(num);
-    }
+
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
     //  RawMemory走査関数
@@ -386,13 +397,40 @@ extern "C" {
 
 
 
+    std::shared_ptr<std::vector<unsigned char>> ToByteVector(const shared_ptr<InputIterator<int>>& src) {
+        auto ret = std::make_shared<std::vector<unsigned char>>();
+        try {
+            for (;;) {
+                ret->push_back((unsigned char)src->Next());
+            }
+        }
+        catch (PyStopIteration&) {
+            //nothsing to do
+        }
+        return ret;
+    }
 
 
-
-
-
-    EXTERN_C shared_ptr<PcmData>* wasm_tbskmodem_PcmData_1(const TBSK_BYTE* src, size_t size, int sample_bits, int frame_rate) {
-        return (shared_ptr<PcmData>*)_instances.Add(make_shared<PcmData>(src, size, sample_bits, frame_rate));
+    /**
+    * BYTEデータからインスタンスを作る。
+    */
+    EXTERN_C shared_ptr<PcmData>* wasm_tbskmodem_PcmData_1(const shared_ptr<InputIterator<int>>* src, int sample_bits, int frame_rate) {
+        std::vector<unsigned char> bsrc;
+        try {
+            for (;;) {
+                bsrc.push_back((unsigned char)(*src)->Next());
+            }
+        }
+        catch (PyStopIteration&) {
+            //nothsing to do
+        }
+        //ファイルをロード
+        return (shared_ptr<PcmData>*)_instances.Add(make_shared<PcmData>(bsrc.data(),bsrc.size(), sample_bits, frame_rate));
+    }
+    EXTERN_C shared_ptr<PcmData>* wasm_tbskmodem_PcmData_2(const shared_ptr<InputIterator<double>>* src, int sample_bits, int frame_rate) {
+        //ファイルをロード
+        auto& s = *(src->get());
+        return (shared_ptr<PcmData>*)_instances.Add(make_shared<PcmData>(s, sample_bits, frame_rate));
     }
 
 

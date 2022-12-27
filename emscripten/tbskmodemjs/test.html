@@ -8,20 +8,9 @@
 <body>
     <button class=mybutton>Run mulBy2</button><br>
     <script>
-        function sandbox(MOD) {
-            let WasmProxy = TBSKmodemJS.WasmProxy;
-            let DoubleInputIterator = TBSKmodemJS.DoubleInputIterator;
-            let IntOutputIterator = TBSKmodemJS.IntOutputIterator;
 
 
-        }
 
-
-        class Listener {
-            waitForSignal() { }
-            pushSorce() { }
-            read() { }
-        }
 
 
 
@@ -30,31 +19,68 @@
 
         window.addEventListener('load', function () {            
             Module.onRuntimeInitialized = function () {
+
+//  TBSK modem
                 Module._TBSKmodemJS();
-                sandbox(Module);
+
 
                 let tj = TBSKmodemJS;
                 var tone = new tj.XPskSinTone(10,10);
                 var preamble = new tj.CoffPreamble(tone);
                 let mod = new tj.TbskModulator(tone, preamble);
                 console.log("pointers:"+tj.getPointerHolderSize());
-                let farray = mod.modulate([1, 2, 3]);
+                let farray = mod.modulate([4, 5, 6]);
                 console.log(farray.length);
 
                 console.log(tj);
+                for(let i = 0; i < 1000; i++){
+                    farray.push(0);
+                }
+                let sum = 0;
+                for (let i = 0; i < farray.length; i++) {
+                    sum += farray[i];
+                }
+                console.log("srcsum:",sum);
+                let b = [];
+                for (let i = 0; i < 2; i++) {
+                    for (let j = 0; j < farray.length; j++) {
+                        b.push(farray[j]);
+                    }
+                }
+                farray = b;
+
+                console.log("demodulate");
                 let demod = new tj.TbskDemodulator(tone, preamble);
                 let dint = demod.demodulate(farray);
                 console.log(dint);
 
-//                var actx = new (window.AudioContext || window.webkitAudioContext)();
+                //listener test
+                console.log("listener");
+                let listener = new tj.TbskListener(tone, preamble);
+                console.log("#1");
+                listener.push(farray);
+                console.log("#2");
+                listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
+                listener.push(farray);
+                console.log("#2.5");
+                listener.push(farray);
+                console.log("#3");
+                listener.push([]);
 
-//                let mod = new Modulator();
- //               let source=mod.modulate2BufferSource(actx,[0,1,2],8000);
 
-                // AudioBufferSourceNode にバッファーを設定する
- //               source.connect(actx.destination);
+
+/*  再生系のテスト
+                var actx = new (window.AudioContext || window.webkitAudioContext)();
+
+                let mod = new Modulator();
+               let source=mod.modulate2BufferSource(actx,[0,1,2],8000);
+
+               // AudioBufferSourceNode にバッファーを設定する
+               source.connect(actx.destination);
                 // 音源の再生を始める
- //               source.start();
+              source.start();
+
+*/
             }
 
 

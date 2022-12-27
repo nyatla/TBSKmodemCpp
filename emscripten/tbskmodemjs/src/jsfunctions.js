@@ -76,7 +76,6 @@ function TBSKmodemJS_init()
                 }
             } catch (e) {
                 if (e instanceof StopIteration) {
-                    console.log("StopIntertion");
                     //nothing to do
                 } else {
                     console.log(e);
@@ -92,7 +91,7 @@ function TBSKmodemJS_init()
         constructor(wasm_instance) {
             super(wasm_instance);
         }
-        next(){
+        next() {
             let s = MOD._wasm_tbskmodem_DoubleOutputIterator_hasNext(this._wasm_instance);
             switch (s) {
                 case 0:
@@ -158,6 +157,7 @@ function TBSKmodemJS_init()
         constructor(tone, threshold, cycle) {
             let _threshold = set_default(threshold, 1.0);
             let _cycle = set_default(cycle, 4);
+            console.log(_threshold,_cycle);
             super(MOD._wasm_tbskmodem_CoffPreamble(tone._wasm_instance, _threshold, _cycle));
         }
     }
@@ -288,7 +288,7 @@ function TBSKmodemJS_init()
         }
         getRecover() {
             let wi = MOD._wasm_tbskmodem_TbskDemodulator_DemodulateResult_Recover(this._wasm_instance);
-            if (wi == null) {
+            if (wi == 0) {
                 return null;
             }
             return new IntOutputIterator(wi);
@@ -299,15 +299,33 @@ function TBSKmodemJS_init()
 
     class TbskListener extends Disposable{
         /**
+         * onStart,onData,onEndはpush関数をトリガーに非同期に呼び出します。
          * 
          * @param {Tone} tone
          * @param {Preamble} preamble
          */
-        constructor(tone, preamble, onSignal, onData, onEndOfSignal) {
+        constructor(tone, preamble, onStart, onData, onEnd) {
             super();
+            let _t = this;
             this._demod=new TbskDemodulator(tone, preamble);
             this._input_buf = new DoubleInputIterator(true);
-            this._currentGenerator = null;
+
+            
+            this._callOnStart = () => {
+                new Promise((resolve) => {
+                    resolve();
+                }).then(() => { if (onStart) {onStart() } });
+            };
+            this._callOnData = (data) => {
+                new Promise((resolve) => {
+                    resolve();
+                }).then(() => { if (onData) {onData(data) } });
+            };
+            this._callOnEnd = () => {
+                new Promise((resolve) => {
+                    resolve();
+                }).then(() => { if (onEnd) {onEnd() } });
+            };
         }
         dispose()
         {
@@ -324,12 +342,12 @@ function TBSKmodemJS_init()
              * @param {any} demod
              * @param {any} input_buf
              */
-            function* workflow(demod, input_buf)
+            function* workflow(demod, input_buf,callOnStart,callOnData,callOnEnd)
             {
+                console.log("workflow called!");
                 let out_buf = null;
                 let dresult = null;
                 dresult = demod._demodulateAsInt_B(input_buf);
-                console.log(this);
 
                 yield function () {
                     out_buf.dispose();
@@ -355,6 +373,7 @@ function TBSKmodemJS_init()
                                 if (out_buf != null) {
                                     break;
                                 }
+
                                 //リカバリ再要求があったので何もしない。
                                 yield;
                             }
@@ -370,25 +389,34 @@ function TBSKmodemJS_init()
                 }
                 //outにイテレータが入っている。
                 console.log("signal");
+                callOnStart();
                 //終端に達する迄取り出し
                 let ra = [];
                 for (; ;) {
                     try {
                         for (; ;) {
-                            ra.push(out_buf.next());
+                            let w = out_buf.next();
+                            ra.push(w);
                         }
                     } catch (e) {
                         if (e instanceof RecoverableStopIteration) {
-                            //ここでdataイベント
-                            console.log("data:");
-                            console.log(ra);
-                            ra = [];
+                            console.log("RecoverableStopIteration");
+                            if (ra.length > 0) {
+                                //ここでdataイベント
+                                console.log("data:");
+                                console.log(ra);
+                                callOnData(ra);
+                                ra = [];
+                            }
                             yield;
                             continue;
                         } else if (e instanceof StopIteration) {
+                            console.log("StopIteration");
                             console.log("data:");
                             console.log(ra);
+                            callOnData(ra);
                             console.log("end");
+                            callOnEnd();
                         }
                         //ここではStopインタレーションの区別がつかないから、次のシグナル検出で判断する。
                     }
@@ -399,22 +427,19 @@ function TBSKmodemJS_init()
                 }
             //関数終了。
             }
+            console.log("push callead!");
             this._input_buf.puts(src);
             console.log("input_buf_len:" + src.length);
             if (this._currentGenerator == null) {
-                this._currentGenerator = workflow(this._demod, this._input_buf);//新規生成
+                this._currentGenerator = workflow(this._demod, this._input_buf, this._callOnStart, this._callOnData, this._callOnEnd);//新規生成
                 this._currentGenerator.dispose = this._currentGenerator.next();
-                console.log("new workflow");
-            } else if (this._currentGenerator.done) {
-                this._currentGenerator = workflow(this._demod, this._input_buf);//終わってたら再生成
-                this._currentGenerator.dispose = this._currentGenerator.next();
-                console.log("renew workflow");
             }
-            this._currentGenerator.next();
+
+            if (this._currentGenerator.next().done) {
+                this._currentGenerator = null;
+            }
         }
-        onSignalStart() { console.log("start signal"); };
-        onSignalEnd() { console.log("end signal"); };
-        onData(v) { cosole.log("on data") };
+
 
 
 
