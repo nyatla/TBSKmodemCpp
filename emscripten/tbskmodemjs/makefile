@@ -1,4 +1,4 @@
-NAME_APP=wasm_main.html
+NAME_APP=tbskmodem_wasm.js
 
 PATH_ROOT=$(shell pwd)
 DIR_SOURCE=./src

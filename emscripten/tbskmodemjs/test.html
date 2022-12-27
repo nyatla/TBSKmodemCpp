@@ -66,6 +66,9 @@
                 listener.push(farray);
                 console.log("#3");
                 listener.push([]);
+                console.log()
+                let pcm = tj.PcmData.create(farray, 16, 8000);
+                console.log(pcm.dump());
 
 
 
@@ -93,6 +96,6 @@
 		
 		});  
   </script>
-  <script async src="wasm_main.js"></script>
+  <script async src="tbskmodem_wasm.js"></script>
 </body>
 </html>

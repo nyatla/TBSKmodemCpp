@@ -101,7 +101,7 @@ public:
         try {
             if (!this->_src) {
                 //emptyならstopiteration扱い
-                EM_ASM({ console.log("RECNULL") });
+//                EM_ASM({ console.log("RECNULL") });
                 return 1;
             }
             auto r = this->_src->Next();
@@ -109,11 +109,11 @@ public:
             return 0;
         }
         catch (RecoverableStopIteration&) {
-            EM_ASM({console.log("RECOVER")});
+//            EM_ASM({console.log("RECOVER")});
             return 1;
         }
         catch (PyStopIteration&) {
-            EM_ASM({ console.log("STOP") });
+//            EM_ASM({ console.log("STOP") });
             return 2;
         }
     }
@@ -195,8 +195,8 @@ extern "C" {
         (*ptr)->Put(v);
     }
 
-    EXTERN_C shared_ptr<InputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator(bool recoveable=false) {
-        auto r = std::make_shared<InputIterator<double>>(recoveable);
+    EXTERN_C shared_ptr<InputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator(bool is_recoveable=false) {
+        auto r = std::make_shared<InputIterator<double>>(is_recoveable);
         return (shared_ptr<InputIterator<double>>*)_instances.Add(r);
     }
     EXTERN_C void EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleInputIterator_put(const shared_ptr<InputIterator<double>>* ptr, double v)
@@ -397,24 +397,24 @@ extern "C" {
 
 
 
-    std::shared_ptr<std::vector<unsigned char>> ToByteVector(const shared_ptr<InputIterator<int>>& src) {
-        auto ret = std::make_shared<std::vector<unsigned char>>();
-        try {
-            for (;;) {
-                ret->push_back((unsigned char)src->Next());
-            }
-        }
-        catch (PyStopIteration&) {
-            //nothsing to do
-        }
-        return ret;
-    }
+    //std::shared_ptr<std::vector<unsigned char>> ToByteVector(const shared_ptr<InputIterator<int>>& src) {
+    //    auto ret = std::make_shared<std::vector<unsigned char>>();
+    //    try {
+    //        for (;;) {
+    //            ret->push_back((unsigned char)src->Next());
+    //        }
+    //    }
+    //    catch (PyStopIteration&) {
+    //        //nothsing to do
+    //    }
+    //    return ret;
+    //}
 
 
     /**
     * BYTEデータからインスタンスを作る。
     */
-    EXTERN_C shared_ptr<PcmData>* wasm_tbskmodem_PcmData_1(const shared_ptr<InputIterator<int>>* src, int sample_bits, int frame_rate) {
+    EXTERN_C shared_ptr<PcmData>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_1(const shared_ptr<InputIterator<int>>* src, int sample_bits, int frame_rate) {
         std::vector<unsigned char> bsrc;
         try {
             for (;;) {
@@ -427,34 +427,54 @@ extern "C" {
         //ファイルをロード
         return (shared_ptr<PcmData>*)_instances.Add(make_shared<PcmData>(bsrc.data(),bsrc.size(), sample_bits, frame_rate));
     }
-    EXTERN_C shared_ptr<PcmData>* wasm_tbskmodem_PcmData_2(const shared_ptr<InputIterator<double>>* src, int sample_bits, int frame_rate) {
+    EXTERN_C shared_ptr<PcmData>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_2(const shared_ptr<InputIterator<double>>* src, int sample_bits, int frame_rate) {
         //ファイルをロード
         auto& s = *(src->get());
+//        int a = s.ToVector()->size();
+//        EM_ASM_({ console.log($0); }, a);
         return (shared_ptr<PcmData>*)_instances.Add(make_shared<PcmData>(s, sample_bits, frame_rate));
     }
 
 
 
-    EXTERN_C int wasm_tbskmodem_PcmData_GetSampleBits(const shared_ptr<PcmData>* ptr)
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_GetSampleBits(const shared_ptr<PcmData>* ptr)
     {
         return (*ptr)->GetSampleBits();
     };
-    EXTERN_C int wasm_tbskmodem_GetFramerate(const shared_ptr<PcmData>* ptr)
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_GetFramerate(const shared_ptr<PcmData>* ptr)
     {
         return (*ptr)->GetFramerate();
     }
-    EXTERN_C int wasm_tbskmodem_GetByteslen(const shared_ptr<PcmData>* ptr) {
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_GetByteslen(const shared_ptr<PcmData>* ptr) {
         return (*ptr)->GetByteslen();
     }
-    EXTERN_C const int wasm_tbskmodem_DataAsFloat(const shared_ptr<PcmData>* ptr, double* buf, int buf_len_in_bytes) {
-        auto& r = (*ptr)->DataAsFloat();
-        auto tick_count = (*ptr)->GetByteslen() / ((*ptr)->GetSampleBits() / 8);
-        if (buf_len_in_bytes < r->size() * sizeof(double) * tick_count) {
-            return 0;
-        }
-        memcpy(buf, r.get(), r->size() * sizeof(double));
-        return r->size();
+    EXTERN_C const shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_DataAsFloat(const shared_ptr<PcmData>* ptr) {
+        const std::shared_ptr<std::vector<double>> r = std::move((*ptr)->DataAsFloat());
+        auto iter_=std::make_shared<PyIterator<double>>(r);
+        return (shared_ptr<OutputIterator<double>>*)_instances.Add(std::make_shared<OutputIterator<double>>(iter_));
     }
+    EXTERN_C const shared_ptr<OutputIterator<int>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_Dump(const shared_ptr<PcmData>* ptr) {
+        class ToVector :public IBinaryWriter {
+        private:
+            std::vector<int>* _dest;
+        public:
+            ToVector(std::vector<int>* s) :_dest{ s } {
+            }
+            size_t WriteBytes(size_t size, const void* buf) {
+                for (auto i = 0;i < size;i++) {
+                    this->_dest->push_back(*(i + (const unsigned char*)buf));
+                }
+                return size;
+            }
+
+        };
+        auto dest = std::make_shared<std::vector<int>>();
+        ToVector v(dest.get());
+        PcmData::Dump(*(ptr->get()),v);
+        auto iter_ = std::make_shared<PyIterator<int>>(dest);
+        return (shared_ptr<OutputIterator<int>>*)_instances.Add(std::make_shared<OutputIterator<int>>(iter_));
+    }
+    
 
 
 
