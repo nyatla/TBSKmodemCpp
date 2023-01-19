@@ -43,7 +43,7 @@ namespace TBSKmodemCPP
         ///** リストの一部を切り取って返します。
         //    この関数はバッファの再配置を行いません。
         //*/    
-        const unique_ptr<vector<T>> Sublist(int pos, int size)const
+        unique_ptr<vector<T>> Sublist(int pos, int size)const
         {
             auto& buf = this->_buf;
             const auto l = this->_buf.size();

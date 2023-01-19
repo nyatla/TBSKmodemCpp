@@ -261,7 +261,7 @@ namespace TBSKmodemCPP
                         //# #ピーク周辺の読出し
                         //# [next(cof) for _ in range(symbol_ticks//4)]
                         //# バッファリングしておいた相関値に3値平均フィルタ
-                        auto& buf_s = cof->GetBuf().Sublist((int)(cof->GetBuf().GetLength() - symbol_ticks), symbol_ticks);//buf = cof.buf[-symbol_ticks:]
+                        const auto& buf_s = cof->GetBuf().Sublist((int)(cof->GetBuf().GetLength() - symbol_ticks), symbol_ticks);//buf = cof.buf[-symbol_ticks:]
                         auto buf = buf_s.get();
                         //var b =[(i + self._nor - symbol_ticks + 1, buf[i] + buf[i + 1] + buf[2]) for i in range(len(buf) - 2)];// #位置,相関値
                         struct TPcTuple {
@@ -290,7 +290,7 @@ namespace TBSKmodemCPP
                         //# Lレベルシンボルの範囲を得る
                         //# s=peak_pos-symbol_ticks*3-(self._nor-cofbuf_len)
                         auto s = peak_pos - symbol_ticks * sample_width - (this->_nor - cofbuf_len);
-                        auto& lw_s = cof->GetBuf().Sublist(s, cycle * symbol_ticks);
+                        const auto& lw_s = cof->GetBuf().Sublist(s, cycle * symbol_ticks);
                         auto lw = lw_s.get();
 
                         vector_sort(lw);
@@ -311,7 +311,7 @@ namespace TBSKmodemCPP
                         //#Hレベルシンボルの範囲を得る
                         //# s=peak_pos-symbol_ticks*6-(self._nor-cofbuf_len)
                         s = peak_pos - symbol_ticks * sample_width * 2 - (this->_nor - cofbuf_len);
-                        auto& lh_s = cof->GetBuf().Sublist(s, cycle * symbol_ticks);
+                        const auto& lh_s = cof->GetBuf().Sublist(s, cycle * symbol_ticks);
                         auto lh = lh_s.get();
                         vector_sort(lh, true);
                         //auto lhlen = (int)(lh->size()) * 3 / 2 + 1;

@@ -167,7 +167,7 @@ namespace TBSKmodemCPP
 
 
 
-    const unique_ptr<vector<double>> PcmData::DataAsFloat()
+    unique_ptr<vector<double>> PcmData::DataAsFloat()
     {
         const TBSK_BYTE* data = (const TBSK_BYTE*)this->_wavfile->GetData()->GetData();
         auto data_size = this->_wavfile->GetData()->GetSize();

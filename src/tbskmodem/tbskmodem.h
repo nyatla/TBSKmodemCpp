@@ -7,5 +7,9 @@
 #include "./kokolink/compatibility.h"
 #include "./kokolink/types/Py__class__.h"
 
-
-
+namespace TBSKmodemCPP
+{
+	const int VERSION_MAJOR = 0;
+	const int VERSION_MINER = 2;
+	const int VERSION_PATCH = 0;
+}
