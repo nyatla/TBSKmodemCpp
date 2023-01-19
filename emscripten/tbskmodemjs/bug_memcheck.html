@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang=en-us>
+<head>
+	<meta charset=utf-8>
+	<meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+	<title>Hello WASM World!</title>
+</head>
+<body>
+    <script>
+        function act() {
+            //  TBSK modem
+            console.log("OK");
+            let tbsk = Module.tbskmodem;
+
+
+            
+            var tone = new tbsk.XPskSinTone(10, 10);
+            tone.dispose();
+            var tone2 = new tbsk.XPskSinTone(10, 10);
+            tone2.dispose();
+            console.log("OK");
+
+        }
+        window.addEventListener('load', function () {
+            Module.onRuntimeInitialized = function () {
+                Module._load_apis();
+            }
+        });
+
+    </script>
+    <button class=mybutton onclick="act()">Run mulBy2</button><br>
+    <script async src="tbskmodem_wasm.js"></script>
+</body>
+</html>

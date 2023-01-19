@@ -6,3 +6,7 @@ source ./emsdk_env.sh
 
 
 cd libtbskmodem make #.aの作成
+
+
+テスト
+python -m http.server 8000

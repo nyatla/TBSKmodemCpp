@@ -8,30 +8,18 @@
 <body>
     <button class=mybutton>Run mulBy2</button><br>
     <script>
-
-
-
-
-
-
-
-
-
         window.addEventListener('load', function () {            
             Module.onRuntimeInitialized = function () {
-
-//  TBSK modem
-                Module._TBSKmodemJS();
-
-
-                let tj = TBSKmodemJS;
+                Module._load_apis();//Module.tbskmodemにクラスライブラリをロード
+                //  TBSK modem
+                let tj = Module.tbskmodem;
                 var tone = new tj.XPskSinTone(10,10);
                 var preamble = new tj.CoffPreamble(tone);
                 let mod = new tj.TbskModulator(tone, preamble);
                 console.log("pointers:"+tj.getPointerHolderSize());
-                let farray = mod.modulate([4, 5, 6]);
+                let farray = mod.modulate("スーパーウルトラセクシーヒーローZAN");
                 console.log(farray.length);
-
+/*
                 console.log(tj);
                 for(let i = 0; i < 1000; i++){
                     farray.push(0);
@@ -51,19 +39,19 @@
 
                 console.log("demodulate");
                 let demod = new tj.TbskDemodulator(tone, preamble);
-                let dint = demod.demodulate(farray);
+                let dint = demod.demodulate(farray, "utf8");
                 console.log(dint);
-
+*/
                 //listener test
                 console.log("listener");
-                let listener = new tj.TbskListener(tone, preamble);
+                let listener = new tj.TbskListener(tone, preamble, { onData: (d) => { console.log(d); } },"utf8");
                 console.log("#1");
                 listener.push(farray);
                 console.log("#2");
-                listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
-                listener.push(farray);
+//                listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
+//                listener.push(farray);
                 console.log("#2.5");
-                listener.push(farray);
+//                listener.push(farray);
                 console.log("#3");
                 listener.push([]);
                 console.log()

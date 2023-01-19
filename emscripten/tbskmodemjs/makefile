@@ -1,4 +1,5 @@
 NAME_APP=tbskmodem_wasm.js
+NAME_MOD=tbskmodem_wasm_mod.js
 
 PATH_ROOT=$(shell pwd)
 DIR_SOURCE=./src
@@ -32,19 +33,32 @@ TARGETS=$(call TO_OBJ_NAME,$(SOURCE_FILES))
 SOURCES=$(call TO_SRC_NAME,$(SOURCE_FILES))
 
 
-all:$(PATH_OUTPUT)/$(NAME_APP)
+
+js:$(PATH_OUTPUT)/$(NAME_APP)
+mod:$(PATH_OUTPUT)/$(NAME_MOD)
+all:js mod
+
 
 clean:
 	rm -f $(PATH_OBJECT)/*.o
-	rm -f $(PATH_OUTPUT)/$(NAME_APP)
+	rm -f $(PATH_OUTPUT)/$(NAME_APP) $(PATH_OUTPUT)/$(NAME_MOD)
 
 
 $(PATH_OUTPUT)/$(NAME_APP):$(TARGET_FILES)
-	$(CC) -O0 -o $(PATH_OUTPUT)/$(NAME_APP)  $(FLGS) $(TARGETS) ../libtbskmodem/libtbskmodem.a --js-library ./src/jsfunctions.js
+	$(CC) -O2 -o $(PATH_OUTPUT)/$(NAME_APP)  $(FLGS) $(TARGETS) ../libtbskmodem/libtbskmodem.a --js-library ./src/jsfunctions.js
 
+# For TBSKmodemJS
+$(PATH_OUTPUT)/$(NAME_MOD):$(TARGET_FILES)
+	$(CC) \
+	-s AUTO_NATIVE_LIBRARIES=0 \
+	-s ENVIRONMENT=web \
+	-s MODULARIZE=1 \
+	-O2 -o $(PATH_OUTPUT)/$(NAME_MOD)  $(FLGS) $(TARGETS) ../libtbskmodem/libtbskmodem.a --js-library ./src/jsfunctions.js
+
+
+# For standard
 $(TARGET_FILES):$(SOURCES);mkdir -p $(PATH_OBJECT)
-	$(CC) $(FLGS)  -s NO_EXIT_RUNTIME=1 \
-	-s "EXTRA_EXPORTED_RUNTIME_METHODS=['getValue', 'setValue']" \
+	$(CC) $(FLGS)  \
 	-c $(TARGET_INCLUDE)  $(call TO_SRC_NAME,$@) -o $(call TO_OBJ_NAME,$@)
 
 

@@ -1,13 +1,15 @@
 
 
-function TBSKmodemJS_init()
+function TBSKmodem_api_load_()
 {
-    if (typeof TBSKmodemJS !== 'undefined') {
-        return;
-    }
     //ここから初期化コード
     let MOD = Module;
-    console.log("Start TBSKmodemJS initialize.");
+    if ("tbskmodem" in MOD) {
+        console.log("tbskmodem api is already initialized.");
+        return;
+    }
+
+    console.log("Start tbskmodem initialize.");
 
     function set_default(a, v) { return (a === undefined || a === null) ? v : a; }
 
@@ -158,11 +160,61 @@ function TBSKmodemJS_init()
         constructor(tone, threshold, cycle) {
             let _threshold = set_default(threshold, 1.0);
             let _cycle = set_default(cycle, 4);
-            console.log(_threshold,_cycle);
+            //console.log(_threshold,_cycle);
             super(MOD._wasm_tbskmodem_CoffPreamble(tone._wasm_instance, _threshold, _cycle));
         }
     }
 
+    class PassDecoder {
+        reset() { }
+        put(data) { return data; }
+
+    }
+
+    class Utf8Decoder {
+        constructor() {
+            this._decoder = new TextDecoder("utf8", { fatal: true });
+            this._q = [];
+            this._tmp = [];
+        }
+        reset() {
+            this._q = [];
+            this._tmp = [];
+        }
+        put(data) {
+//            console.log("q:", this._q);
+            for (let i = 0; i < data.length; i++) {
+                this._q.push(data[i]);
+            }
+//            console.log("q2:", this._q);
+            let ret = [];
+            ML:
+            while (this._q.length > 0) {
+                for (var i = 0; i < this._q.length; i++) {
+                    try {
+                        let inp = new Uint8Array(this._q.slice(0, i + 1));
+//                        console.log(inp);
+                        ret.push(this._decoder.decode(inp));
+                        this._q = this._q.slice(i + 1);
+                        continue ML;//q更新
+                    } catch (e) {
+//                        console.log("OOPD");
+                        if (i > 8) {
+                            ret.push(this._q[0]);
+                            this._q = this._q.slice(1);
+                            continue ML;//q更新
+                        }
+                    }
+                }
+                break;
+            }
+            if (ret.length > 0) {
+                return ret;
+            }
+
+            return undefined;
+        }
+    }
 
 
     class TbskModulator extends WasmProxy
@@ -176,13 +228,18 @@ function TBSKmodemJS_init()
             super(MOD._wasm_tbskmodem_TbskModulator(tone._wasm_instance, preamble._wasm_instance));
         }
         /**
-         * @param {array[uint8]} src
+         * @param {array[uint8]|string} src
          * @return {FloatArray}
          */
         modulate(src) {
             var buf = new IntInputIterator();
             try {
-                buf.puts(src);
+                if (typeof (src) == "string") {
+                    let te = new TextEncoder();                    
+                    buf.puts(te.encode(src));
+                } else {
+                    buf.puts(src);
+                }
                 //int*を渡して、[int,float...]のポインタを返してもらう。
                 let wi = MOD._wasm_tbskmodem_TbskModulator_Modulate_A(this._wasm_instance, buf._wasm_instance);
                 if (wi == null) {
@@ -208,7 +265,7 @@ function TBSKmodemJS_init()
          */
         modulate2AudioBuffer(actx, src, sampleRate) {
             let f32_array = this.modulate(src);
-            console.log(f32_array);
+            //console.log(f32_array);
             let buf = actx.createBuffer(1, f32_array.length, sampleRate);
             buf.getChannelData(0).set(f32_array);
             return buf;
@@ -241,7 +298,13 @@ function TBSKmodemJS_init()
          * @param src array[double]
          * @return array[uint8]
          */
-        demodulate(src) {
+        demodulate(src, decoder = undefined)
+        {
+            if (decoder == "utf8") {
+                decoder = new Utf8Decoder();
+            } else {
+                decoder = new PassDecoder();
+            }
             let buf = new DoubleInputIterator();
             try {
                 buf.puts(src);
@@ -253,7 +316,11 @@ function TBSKmodemJS_init()
                 }
                 // arrayに変換
                 try {
-                    return out.toArray();
+                    if (decoder) {
+                        return decoder.put(out.toArray());
+                    } else {
+                        return out.toArray();
+                    }
                 } finally {
                     out.dispose();
                 }
@@ -300,28 +367,34 @@ function TBSKmodemJS_init()
         /**
          * onStart,onData,onEndはpush関数をトリガーに非同期に呼び出します。
          * 
+         * デコードオブジェクトは、T put(data),reset()の関数を持つオブジェクトで、与えられたdataからTが生成できたときにTを返します。生成できない場合はundefinedです。resetで状態を初期化します。
+         * 
          * @param {Tone} tone
          * @param {Preamble} preamble
          */
-        constructor(tone, preamble, onStart, onData, onEnd) {
+        constructor(tone, preamble, events = {}, decoder = undefined) {
             super();
+            if (!("onStart" in events)) { events.onStart = null; }
+            if (!("onData" in events)) { events.onData = null; }
+            if (!("onEnd" in events)) { events.onEnd = null; }
             let _t = this;
+            this._decoder = decoder == "utf8" ? new Utf8Decoder() : new PassDecoder();
             this._demod=new TbskDemodulator(tone, preamble);
             this._input_buf = new DoubleInputIterator(true);
             this._callOnStart = () => {
                 new Promise((resolve) => {
                     resolve();
-                }).then(() => { if (onStart) {onStart() } });
+                }).then(() => { if (events.onStart) { events.onStart() } });
             };
             this._callOnData = (data) => {
                 new Promise((resolve) => {
                     resolve();
-                }).then(() => { if (onData) {onData(data) } });
+                }).then(() => { if (events.onData) { events.onData(data) } });
             };
             this._callOnEnd = () => {
                 new Promise((resolve) => {
                     resolve();
-                }).then(() => { if (onEnd) {onEnd() } });
+                }).then(() => { if (events.onEnd) { events.onEnd() } });
             };
         }
         dispose()
@@ -339,8 +412,9 @@ function TBSKmodemJS_init()
              * @param {any} demod
              * @param {any} input_buf
              */
-            function* workflow(demod, input_buf,callOnStart,callOnData,callOnEnd)
+            function* workflow(demod, input_buf,callOnStart,callOnData,callOnEnd,decoder)
             {
+                decoder.reset();
 //                console.log("workflow called!");
                 let out_buf = null;
                 let dresult = null;
@@ -402,22 +476,38 @@ function TBSKmodemJS_init()
                                 //ここでdataイベント
                                 console.log("data:");
 //                                console.log(ra);
-                                callOnData(ra);
+                                if (decoder) {
+                                    let rd = decoder.put(ra);
+                                    if (rd) {
+                                        callOnData(rd);
+                                    }
+                                } else {
+                                    callOnData(ra);
+                                }
                                 ra = [];
                             }
                             yield;
                             continue;
                         } else if (e instanceof StopIteration) {
-//                            console.log("StopIteration");
-//                            console.log("data:");
-//                            console.log(ra);
-                            callOnData(ra);
-//                            console.log("end");
+                            if (ra.length > 0) {
+                                //console.log("StopIteration");
+                                console.log("data:");
+                                //console.log(ra);
+                                if (decoder) {
+                                    let rd = decoder.put(ra);
+                                    if (rd) {
+                                        callOnData(rd);
+                                    }
+                                } else {
+                                    callOnData(ra);
+                                }
+                                ra = [];
+                            }
+                            console.log("Signal lost!");
                             callOnEnd();
                         }
                         //ここではStopインタレーションの区別がつかないから、次のシグナル検出で判断する。
                     }
-                    console.log("Signal lost!");
                     out_buf.dispose();
                     out_buf = null;
                     return;//done
@@ -428,7 +518,7 @@ function TBSKmodemJS_init()
             this._input_buf.puts(src);
 //            console.log("input_buf_len:" + src.length);
             if (this._currentGenerator == null) {
-                this._currentGenerator = workflow(this._demod, this._input_buf, this._callOnStart, this._callOnData, this._callOnEnd);//新規生成
+                this._currentGenerator = workflow(this._demod, this._input_buf, this._callOnStart, this._callOnData, this._callOnEnd, this._decoder);//新規生成
                 this._currentGenerator.dispose = this._currentGenerator.next();
             }
 
@@ -436,7 +526,6 @@ function TBSKmodemJS_init()
                 this._currentGenerator = null;
             }
         }
-
 
 
 
@@ -466,10 +555,11 @@ function TBSKmodemJS_init()
 
     }
 
-    TBSKmodemJS = {
+    MOD.tbskmodem = {
         getPointerHolderSize: function () {
             return MOD._wasm_tbskmodem_PointerHolder_Size();
         },
+        Utf8Decoder: Utf8Decoder,
         WasmProxy: WasmProxy,
 
         StopIteration: StopIteration,
@@ -487,13 +577,13 @@ function TBSKmodemJS_init()
         TbskListener: TbskListener,
         PcmData: PcmData
     };
-    console.log("TBSKmodemJS is ready!2");
-
-
+    console.log("tbskmodem initialized.", this._instance);
+    return this._instance;
 }
 
+
 mergeInto(LibraryManager.library, {
-    TBSKmodemJS_init
+    TBSKmodem_api_load_
 });
 
 

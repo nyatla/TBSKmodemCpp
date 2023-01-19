@@ -137,7 +137,16 @@ public:
 extern "C" {
 #endif
 
-
+    EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_VERSION(int mode)
+    {
+        switch (mode) {
+        case 0:return TBSKmodemCPP::VERSION_MAJOR;
+        case 1:return TBSKmodemCPP::VERSION_MINER;
+        case 2:return TBSKmodemCPP::VERSION_PATCH;
+        default:
+            return -1;
+        }
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -486,18 +495,17 @@ extern "C" {
 #endif
 
 
-
-    extern void TBSKmodemJS_init();
-    void EMSCRIPTEN_KEEPALIVE TBSKmodemJS() {
-        TBSKmodemJS_init();
+    extern  void TBSKmodem_api_load_();
+    void EMSCRIPTEN_KEEPALIVE load_apis() {
+        return TBSKmodem_api_load_();
     }
 
 #ifdef __cplusplus
 }
 #endif
 
-
-//int main()
-//{
-//    TBSKmodemJS_init();
-//}
+/*
+void main()
+{
+    TBSKmodem_api_load_();
+}*/
