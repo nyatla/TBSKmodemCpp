@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_TBSK_DBG=1</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -130,6 +130,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\compatibility.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\cpp_debug.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2BytesFilter.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2StrFilter.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\filter\BitsWidthFilter.h" />
@@ -161,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\compatibility.cpp" />
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\cpp_debug.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2BytesFilter.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\Bits2StrFilter.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\filter\BitsWidthFilter.cpp" />

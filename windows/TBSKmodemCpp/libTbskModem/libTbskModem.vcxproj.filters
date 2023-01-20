@@ -124,6 +124,9 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\NoneCopyConstructor_class.h">
       <Filter>おソースファイル</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\cpp_debug.h">
+      <Filter>おソースファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\interfaces.h">
@@ -197,6 +200,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.cpp">
       <Filter>おソースファイル\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\cpp_debug.cpp">
+      <Filter>おソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
