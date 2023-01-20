@@ -400,7 +400,11 @@ function TBSKmodem_api_load_()
         dispose()
         {
             if (this._currentGenerator) {
-                this._currentGenerator.dispose();
+                try {
+                    this._currentGenerator.throw(new Error('Brake workflow!'));
+                } catch (e) {
+//                    console.log("force dispose");//nothing to do
+                }
             }
             this._demod.dispose();
             this._input_buf.dispose();
@@ -419,107 +423,107 @@ function TBSKmodem_api_load_()
                 let out_buf = null;
                 let dresult = null;
                 dresult = demod._demodulateAsInt_B(input_buf);
-
-                yield function () {
-                    out_buf.dispose();
-                    dresult.dispose();
-                    out_buf = null;
-                    dresult = null;
-                }
                 if (dresult == null) {
                     //未検出でinputが終端
                     console.error("input err");
                     return;//done
                 }
-                try {
-                    switch (dresult.getType()) {
-                        case 1://1 iter
-//                            console.log("signal detected");
-                            out_buf = dresult.getOutput();
-                            break;
-                        case 2:// recover
-                            for (; ;) {
-//                                console.log("recover");
-                                out_buf = dresult.getRecover();
-                                if (out_buf != null) {
-                                    break;
-                                }
+                try
+                {
+                    try {
+                        switch (dresult.getType()) {
+                            case 1://1 iter
+                                //                            console.log("signal detected");
+                                out_buf = dresult.getOutput();
+                                break;
+                            case 2:// recover
+                                for (; ;) {
+                                    //                                console.log("recover");
+                                    out_buf = dresult.getRecover();
+                                    if (out_buf != null) {
+                                        break;
+                                    }
 
-                                //リカバリ再要求があったので何もしない。
-                                yield;
+                                    //リカバリ再要求があったので何もしない。
+                                    yield;
+                                }
+                                break
+                            default:
+                                //継続不能なエラー
+                                console.error("unknown type.");
+                                return;//done
+                        }
+                    } finally {
+                        dresult.dispose();
+                        dresult = null;
+                    }
+                    //outにイテレータが入っている。
+                    console.log("Signal detected!");
+                    callOnStart();
+                    //終端に達する迄取り出し
+                    let ra = [];
+                    for (; ;) {
+                        try {
+                            for (; ;) {
+                                let w = out_buf.next();
+                                ra.push(w);
                             }
-                            break
-                        default:
-                            //継続不能なエラー
-                            console.error("unknown type.");
-                            return;//done
+                        } catch (e) {
+                            if (e instanceof RecoverableStopIteration) {
+                                //                            console.log("RecoverableStopIteration");
+                                if (ra.length > 0) {
+                                    //ここでdataイベント
+                                    console.log("data:");
+                                    //                                console.log(ra);
+                                    if (decoder) {
+                                        let rd = decoder.put(ra);
+                                        if (rd) {
+                                            callOnData(rd);
+                                        }
+                                    } else {
+                                        callOnData(ra);
+                                    }
+                                    ra = [];
+                                }
+                                yield;
+                                continue;
+                            } else if (e instanceof StopIteration) {
+                                if (ra.length > 0) {
+                                    //console.log("StopIteration");
+                                    console.log("data:");
+                                    //console.log(ra);
+                                    if (decoder) {
+                                        let rd = decoder.put(ra);
+                                        if (rd) {
+                                            callOnData(rd);
+                                        }
+                                    } else {
+                                        callOnData(ra);
+                                    }
+                                    ra = [];
+                                }
+                                console.log("Signal lost!");
+                                callOnEnd();
+                            }
+                            //ここではStopインタレーションの区別がつかないから、次のシグナル検出で判断する。
+                        }
+                        out_buf.dispose();
+                        out_buf = null;
+                        return;//done
                     }
                 } finally {
-                    dresult.dispose();
-                    dresult = null;
+//                    console.log("dispose workflow");
+                    if (out_buf) { out_buf.dispose(); }
+                    if (dresult) { dresult.dispose(); }
                 }
-                //outにイテレータが入っている。
-                console.log("Signal detected!");
-                callOnStart();
-                //終端に達する迄取り出し
-                let ra = [];
-                for (; ;) {
-                    try {
-                        for (; ;) {
-                            let w = out_buf.next();
-                            ra.push(w);
-                        }
-                    } catch (e) {
-                        if (e instanceof RecoverableStopIteration) {
-//                            console.log("RecoverableStopIteration");
-                            if (ra.length > 0) {
-                                //ここでdataイベント
-                                console.log("data:");
-//                                console.log(ra);
-                                if (decoder) {
-                                    let rd = decoder.put(ra);
-                                    if (rd) {
-                                        callOnData(rd);
-                                    }
-                                } else {
-                                    callOnData(ra);
-                                }
-                                ra = [];
-                            }
-                            yield;
-                            continue;
-                        } else if (e instanceof StopIteration) {
-                            if (ra.length > 0) {
-                                //console.log("StopIteration");
-                                console.log("data:");
-                                //console.log(ra);
-                                if (decoder) {
-                                    let rd = decoder.put(ra);
-                                    if (rd) {
-                                        callOnData(rd);
-                                    }
-                                } else {
-                                    callOnData(ra);
-                                }
-                                ra = [];
-                            }
-                            console.log("Signal lost!");
-                            callOnEnd();
-                        }
-                        //ここではStopインタレーションの区別がつかないから、次のシグナル検出で判断する。
-                    }
-                    out_buf.dispose();
-                    out_buf = null;
-                    return;//done
-                }
-            //関数終了。
+                //関数終了。
+                console.log("end of workflow");
             }
 //            console.log("push callead!");
             this._input_buf.puts(src);
 //            console.log("input_buf_len:" + src.length);
             if (this._currentGenerator == null) {
                 this._currentGenerator = workflow(this._demod, this._input_buf, this._callOnStart, this._callOnData, this._callOnEnd, this._decoder);//新規生成
-                this._currentGenerator.dispose = this._currentGenerator.next();
             }
 
             if (this._currentGenerator.next().done) {
@@ -554,9 +558,12 @@ function TBSKmodem_api_load_()
         }
 
     }
-
+    const JSBIND_VERSION = "JSBind/0.1.0";
     MOD.tbskmodem = {
-        getPointerHolderSize: function () {
+        VERSION: (() => {
+            return JSBIND_VERSION+";TBSKmodemCPP/" + MOD._wasm_tbskmodem_VERSION(0) + "." + MOD._wasm_tbskmodem_VERSION(1) + "." + MOD._wasm_tbskmodem_VERSION(2);
+        })(),
+        getPointerHolderSize:()=>{
             return MOD._wasm_tbskmodem_PointerHolder_Size();
         },
         Utf8Decoder: Utf8Decoder,
