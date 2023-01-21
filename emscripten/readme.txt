@@ -10,3 +10,10 @@ cd libtbskmodem make #.aの作成
 
 テスト
 python -m http.server 8000
+
+cd libtbskmodem
+make
+
+cd tbskmodemjs
+make
+make mod #<-standalone module.
