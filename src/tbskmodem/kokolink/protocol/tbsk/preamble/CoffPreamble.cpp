@@ -295,7 +295,7 @@ namespace TBSKmodemCPP
 
                         vector_sort(lw);
                         //auto lwlen = (int)(lw->size()) * 3 / 2 + 1;
-                        auto lwlen = (int)(lw->size()) * 2 / 3 + 1;
+                        auto lwlen = (int)(lw->size());
                         auto lwsum = vector_sum(lw, 0, lwlen);
                         auto lw0 = lw->at(0);
 
@@ -315,7 +315,7 @@ namespace TBSKmodemCPP
                         auto lh = lh_s.get();
                         vector_sort(lh, true);
                         //auto lhlen = (int)(lh->size()) * 3 / 2 + 1;
-                        auto lhlen = (int)(lh->size()) * 2 / 3 + 1;
+                        auto lhlen = (int)(lh->size());
                         auto lhsum = vector_sum(lh, 0, lhlen);
                         auto lh0 = lh->at(0);
                         //lh = lh.Take(lh.Length * 3 / 2 + 1).ToArray(); //lh = lh[:len(lh) * 3 / 2 + 1]
