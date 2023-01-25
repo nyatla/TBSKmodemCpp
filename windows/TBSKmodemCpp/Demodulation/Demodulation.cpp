@@ -18,29 +18,37 @@ int main()
 		tone->Mul(0.5);
 		auto preamble = make_shared<CoffPreamble>(tone);
 		auto mod = make_shared<TbskModulator>(tone, preamble);
-		//std::vector<int> bits{ 0,1,0,1,0,1,0,1 };
-		//auto src = std::make_shared<PyIterator<int>>(bits);
-		//auto a = std::make_shared<RoStream<int>>(src);
-		std::vector<int> bytes{};
+		std::vector<int> bytes;
+		for (int i = 0;i < 16*4;i++) {
+			bytes.push_back(0);
+			bytes.push_back(1);
+		}
 		auto src = std::make_shared<PyIterator<int>>(bytes);
 		auto a = std::make_shared<RoStream<int>>(src);
-		auto c = mod->Modulate(a);
-		//auto d = Functions::ToVector<double>(c);
-		auto d = make_shared<std::vector<double>>();
+		auto c = mod->ModulateAsBit(a);
+		auto d = Functions::ToVector<double>(c);
 
-		FileWriter fw("./test2.wav");
 		PcmData pcm(d, 16, 8000);
-		PcmData::Dump(pcm, fw);
+		{
+			FileWriter fw("./test2.wav");
+			PcmData::Dump(pcm, fw);
+		}
+		auto dem = std::make_shared<TbskDemodulator>(tone, preamble);
+		{
 
-		auto dem = std::make_shared<TbskDemodulator>(tone,preamble);
-		auto demod_bits=dem->DemodulateAsInt(std::make_shared<PyIterator<double>>(d));
-		if (demod_bits) {
-			printf("OK");
+			FileReader fr("./test2.wav");
+			auto pcmsrc=PcmData::Load(fr);
+			auto d2=pcmsrc->DataAsFloat();
+			auto demod_bits = dem->DemodulateAsInt(std::make_shared<PyIterator<double>>(d2));
+			if (demod_bits) {
+				printf("OK");
+			}
+			else {
+				printf("NG");
+			}
+			auto decoded = Functions::ToVector<int>(demod_bits);
 		}
-		else {
-			printf("NG");
-		}
-		auto decoded = Functions::ToVector<int>(demod_bits);
+
 	}
 	_CrtDumpMemoryLeaks();
 	return 0;

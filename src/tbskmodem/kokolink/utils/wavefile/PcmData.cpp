@@ -167,13 +167,13 @@ namespace TBSKmodemCPP
 
 
 
-    unique_ptr<vector<double>> PcmData::DataAsFloat()
+    unique_ptr<const vector<double>> PcmData::DataAsFloat()const
     {
         const TBSK_BYTE* data = (const TBSK_BYTE*)this->_wavfile->GetData()->GetData();
         auto data_size = this->_wavfile->GetData()->GetSize();
         auto bits = this->GetSampleBits();
 
-        auto ret = unique_ptr<vector<double>>();
+        auto ret = make_unique<vector<double>>();
         if (bits == 8) {
             for (auto i = 0;i < data_size;i++) {
                 ret->push_back(*(data + i) / 255. - 0.5);
@@ -190,7 +190,7 @@ namespace TBSKmodemCPP
             TBSK_UINT16 b = 0;
             for (auto i = 0;i < data_size;i++)
             {
-                b = (TBSK_UINT16)(b >> 8 | (i << 8));
+                b = (TBSK_UINT16)(b >> 8 | ((TBSK_UINT16)(*(data+i)) << 8));
                 c = (c + 1) % 2;
                 if (c == 0) {
                     if ((0x8000 & b) == 0) {
@@ -198,7 +198,7 @@ namespace TBSKmodemCPP
                     }
                     else
                     {
-                        ret->push_back((((TBSK_UINT32)b - 0x0000ffff) - 1) / r);
+                        ret->push_back((((TBSK_INT32)b - 0x0000ffff) - 1) / r);
                     }
                     b = 0;
                 }

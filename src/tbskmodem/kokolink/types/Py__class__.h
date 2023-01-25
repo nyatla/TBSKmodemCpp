@@ -62,8 +62,8 @@ namespace TBSKmodemCPP
     public:
         //PyIterator(const vector<T>* src) :
         //    _src{ make_unique<VectorWrapper>(src) } {}
-        //PyIterator(const unique_ptr<const vector<T>>& src) :
-        //    _src{make_unique<PtrWrapperCU>(src) } {};//参照
+        PyIterator(const unique_ptr<const vector<T>>& src) :
+            _src{make_unique<PtrWrapperCU>(src) } {};//参照
         PyIterator(const shared_ptr<const vector<T>>& src) :
             _src{ make_unique<PtrWrapperCS>(src) } {};//共有
         PyIterator(const vector<T>& src) :

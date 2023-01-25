@@ -86,17 +86,17 @@ namespace TBSKmodemCPP
     }
     int FmtChunk::GetNchannels()const
     {
-        return this->_buf->AsInt16LE(2);
+        return this->_buf->AsInt16LE(2 + 8);
     }
 
     unsigned int FmtChunk::GetFramerate()const
     {
-        return (unsigned int)this->_buf->AsInt32LE(4);
+        return (unsigned int)this->_buf->AsInt32LE(4 + 8);
     }
 
     int FmtChunk::GetSamplewidth()const
     {
-        return this->_buf->AsInt16LE(14);
+        return this->_buf->AsInt16LE(14+8);
     }
 
 }
@@ -313,7 +313,7 @@ namespace TBSKmodemCPP
             }
             int size;
             fp.ReadInt32LE(&size);
-            chunk_size -= 8;
+            chunk_size -= 8+size+size%2;
             if (memcmp(name, "fmt ", 4) == 0) {
                 this->_chunks.push_back(std::make_shared<FmtChunk>(size, fp));
             }

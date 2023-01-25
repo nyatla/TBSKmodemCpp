@@ -63,6 +63,10 @@ namespace TBSKmodemCPP
     //  必要なサイズを読みだせない場合BinaryReaderException
     size_t FileWriter::WriteBytes(size_t size, const void* buf){
         this->_ofs->write((const char*)buf, size);
+        if (this->_ofs->fail()) {
+            throw BinaryReaderException();
+        }
+        this->_ofs->flush();
         return size;      
     }
 
