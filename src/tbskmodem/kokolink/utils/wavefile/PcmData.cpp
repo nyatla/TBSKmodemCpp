@@ -1,3 +1,4 @@
+#include "../FloatConverter.h"
 #include "./PcmData.h"
 #include <stdexcept>
 #include <exception>
@@ -19,8 +20,7 @@ namespace TBSKmodemCPP
         {
             try {
                 for (;;) {
-                    auto d = fdata.Next();
-                    ret->push_back((TBSK_BYTE)(d * 127 + 128));
+                    ret->push_back(FloatConverter::DoubleToByte(fdata.Next()));
                 }
             }
             catch (PyStopIteration&) {
@@ -33,20 +33,9 @@ namespace TBSKmodemCPP
             int r = (int)((pow(2, 16) - 1) / 2); //#Daisukeパッチ
             try {
                 for (;;) {
-                    auto d = fdata.Next();
-                    auto f = d * r;
-                    if (f >= 0)
-                    {
-                        TBSK_UINT16 v = (TBSK_UINT16)(min((double)INT16_MAX, f));
-                        ret->push_back((TBSK_BYTE)(v & 0xff));
-                        ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
-                    }
-                    else
-                    {
-                        TBSK_UINT16 v = (TBSK_UINT16)(0xffff + (int)(max(f, (double)INT16_MIN)) + 1);
-                        ret->push_back((TBSK_BYTE)(v & 0xff));
-                        ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
-                    }
+                    auto v = FloatConverter::DoubleToInt16(fdata.Next());
+                    ret->push_back((TBSK_BYTE)(((TBSK_UINT16)v) & 0xff));
+                    ret->push_back((TBSK_BYTE)((v >> 8) & 0xff));
                 }
             }catch (PyStopIteration&) {
                     //nothing to do
@@ -110,59 +99,22 @@ namespace TBSKmodemCPP
     {
         return this->_wavfile->GetFmt()->GetFramerate();
     }
-    // @property
-    // def timelen(self):
-    //     """データの記録時間
-    //     """
-    //     return len(self._frames)/(self._sample_bits//8*self._frame_rate)
-    //float GetTimelen()const {
-    //    return this->_wavfile._frames.size() / (this->_sample_bits / 8 * this->_frame_rate);
-    //}
 
 
 
 
-    // @property
-    // def byteslen(self)->int:
-    //     """Waveファイルのデータサイズ
-    //     Waveファイルのdataセクションに格納されるサイズです。
-    //     """
-    //     return len(self._frames)
+
+
     int PcmData::GetByteslen()const {
         return this->_wavfile->GetData()->GetSize();
     }
-    // @property
-    // def data(self)->bytes:
-    //     """ 振幅データ
-    //     """
-    //     return self._frames
-    //const TBSK_BYTE* GetData()
-    //{
-    //    return this->_wavfile.GetData()->.data();
-    //}
-
-
-    // def dataAsFloat(self)->Sequence[float]:
-
-    //     data=self._frames
-    //     bits=self._sample_bits
-    //     if bits==8:
-    //         # a=[struct.unpack_from("B",data,i)[0]/256-0.5 for i in range(len(data))]
-    //         # b=list(np.frombuffer(data, dtype="uint8")/256-0.5)
-    //         # print(a==b)
-    //         # return list(np.frombuffer(data, dtype="uint8")/256-0.5)
-    //         return [struct.unpack_from("B",data,i)[0]/255-0.5 for i in range(len(data))]
-    //     elif bits==16:
-    //         assert(len(data)%2==0)
-    //         r=(2**16-1)//2 #Daisukeパッチ
-    //         # a=[struct.unpack_from("<h",data,i*2)[0]/r for i in range(len(data)//2)]
-    //         # b=list(np.frombuffer(data, dtype="int16")/r)
-    //         # print(a==b)
-    //         # return list(np.frombuffer(data, dtype="int16")/r)
-    //         return [struct.unpack_from("<h",data,i*2)[0]/r for i in range(len(data)//2)]
-    //     raise ValueError()
-
-
+    /// <summary>
+    /// バイナリデータをそのまま返す。
+    /// </summary>
+    /// <returns></returns>
+    const TBSK_BYTE* PcmData::GetData()const {
+        return (const TBSK_BYTE*)this->_wavfile->GetData()->GetData();
+    }
 
 
 
@@ -176,7 +128,7 @@ namespace TBSKmodemCPP
         auto ret = make_unique<vector<double>>();
         if (bits == 8) {
             for (auto i = 0;i < data_size;i++) {
-                ret->push_back(*(data + i) / 255. - 0.5);
+                ret->push_back(FloatConverter::ByteToDouble(*(data + i)));
             }
             return ret;
         }
@@ -186,22 +138,10 @@ namespace TBSKmodemCPP
             }
             //TBSK_ASSERT(data_size%2==0);
             double r = (std::pow(2, 16) - 1) / 2;//(2 * *16 - 1)//2 #Daisukeパッチ
-            int c = 0;
-            TBSK_UINT16 b = 0;
-            for (auto i = 0;i < data_size;i++)
+            for (auto i = 0;i < data_size;i += 2)
             {
-                b = (TBSK_UINT16)(b >> 8 | ((TBSK_UINT16)(*(data+i)) << 8));
-                c = (c + 1) % 2;
-                if (c == 0) {
-                    if ((0x8000 & b) == 0) {
-                        ret->push_back(b / r);
-                    }
-                    else
-                    {
-                        ret->push_back((((TBSK_INT32)b - 0x0000ffff) - 1) / r);
-                    }
-                    b = 0;
-                }
+                TBSK_INT16 v = (TBSK_INT16)((TBSK_UINT16) (* (data + i)) | (((TBSK_UINT16) * (data + i+1)) << 8));
+                ret->push_back(FloatConverter::Int16ToDouble(v));
             }
             return ret;
         }

@@ -37,6 +37,7 @@ namespace TBSKmodemCPP
         int GetSampleBits()const;
         int GetFramerate()const;
         int GetByteslen()const;
+        const TBSK_BYTE* GetData()const;
         unique_ptr<const vector<double>> DataAsFloat()const;
 
     };

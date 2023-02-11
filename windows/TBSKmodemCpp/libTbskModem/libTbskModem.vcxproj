@@ -150,6 +150,7 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BufferedIterator.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\FloatConverter.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.h" />
@@ -159,6 +160,10 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\riffio.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem\TbskDemodulator.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem\TbskModulator.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem\TbskPreamble.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem\TbskTone.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\compatibility.cpp" />
@@ -179,6 +184,7 @@
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AsyncMethod.h" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.cpp" />
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\FloatConverter.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.cpp" />
@@ -186,6 +192,8 @@
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\riffio.cpp" />
+    <ClCompile Include="..\..\..\src\tbskmodem\tbskmodem\TbskDemodulator.cpp" />
+    <ClCompile Include="..\..\..\src\tbskmodem\tbskmodem\TbskModulator.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
