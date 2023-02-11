@@ -38,8 +38,7 @@ namespace TBSKmodemCPP
     private:
         unique_ptr<vector<int>> _sequence;
     public:
-        MSeqTone(int bits, int tap);
-        MSeqTone(int bits, int tap, const TraitTone& base_tone);
+        MSeqTone(MSequence& mseq, const TraitTone& base_tone);
 
         virtual ~MSeqTone();
         const std::vector<int>& GetSequence();

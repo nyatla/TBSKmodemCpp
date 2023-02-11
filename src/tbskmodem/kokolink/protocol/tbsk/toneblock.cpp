@@ -46,12 +46,7 @@ namespace TBSKmodemCPP
     // """ トーン信号を巡回符号でBPSK変調した信号です。
     //     2^bits-1*len(base_tone)の長さです。
     // """
-    MSeqTone::MSeqTone(int bits, int tap) :MSeqTone(bits, tap, SinTone(20, 1))
-    {
-    }
-    MSeqTone::MSeqTone(int bits, int tap, const TraitTone& base_tone) :TraitTone()
-    {
-        auto mseq = MSequence(bits, tap);
+    MSeqTone::MSeqTone(MSequence& mseq, const TraitTone& base_tone) :TraitTone() {
         auto sequence = mseq.GenOneCycle();
 
         for (int i = 0;i < sequence->size();i++) {
@@ -62,6 +57,7 @@ namespace TBSKmodemCPP
         }
         this->_sequence = std::move(sequence);
     }
+
     MSeqTone::~MSeqTone() {
     }
     const vector<int>& MSeqTone::GetSequence()

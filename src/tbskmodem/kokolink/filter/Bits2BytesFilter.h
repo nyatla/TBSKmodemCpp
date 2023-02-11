@@ -22,7 +22,7 @@ namespace TBSKmodemCPP
     public:
         Bits2BytesFilter(int input_bits = 1);
         virtual ~Bits2BytesFilter();
-        Bits2BytesFilter& SetInput(const shared_ptr<IRoStream<int>>& src)override;
+        Bits2BytesFilter& SetInput(const std::shared_ptr<IRoStream<int>>& src)override;
         TBSK_BYTE Next()override;
         TBSK_INT64 GetPos()const override;
     };

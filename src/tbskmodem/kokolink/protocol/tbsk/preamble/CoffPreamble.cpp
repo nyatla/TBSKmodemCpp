@@ -350,6 +350,13 @@ namespace TBSKmodemCPP
         }
     };
 
+
+
+
+    const int CoffPreamble::DEFAULT_CYCLE = 4;
+    const double CoffPreamble::DEFAULT_TH = 1.0;
+
+
     CoffPreamble::CoffPreamble(const shared_ptr<const TraitTone>& tone, double threshold, int cycle) :
         _symbol{ tone },
         _threshold{threshold},
