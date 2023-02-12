@@ -2,7 +2,7 @@
 #include "TbskModulator.h"
 #include "TbskTone.h"
 #include "TbskPreamble.h"
-
+#include <string.h>
 
 namespace TBSKmodemCPP
 {
