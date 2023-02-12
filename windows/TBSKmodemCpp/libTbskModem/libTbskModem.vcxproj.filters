@@ -145,6 +145,12 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\FloatConverter.h">
       <Filter>kokolink\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator2.h">
+      <Filter>kokolink\utils\math\corrcoef</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\ISelfCorrcoefIterator.h">
+      <Filter>kokolink\utils\math\corrcoef</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\interfaces.h">
@@ -230,6 +236,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\FloatConverter.cpp">
       <Filter>kokolink\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator2.cpp">
+      <Filter>kokolink\utils\math\corrcoef</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,6 +2,7 @@
 #include "../../utils/SumIterator.h"
 #include "../../utils/AverageInterator.h"
 #include "../../cpp_debug.h"
+#include "../../utils/math/corrcoef/SelfCorrcoefIterator2.h"
 
 
 namespace TBSKmodemCPP
@@ -97,7 +98,7 @@ namespace TBSKmodemCPP
     TraitBlockDecoder& TraitBlockDecoder::SetInput(const shared_ptr<IRoStream<double>>& src)
     {
         this->_is_eos = false;
-        auto cof = make_shared<SelfCorrcoefIterator>(this->_trait_block_ticks, src, this->_trait_block_ticks);
+        auto cof = make_shared<SelfCorrcoefIterator2>(this->_trait_block_ticks, src, this->_trait_block_ticks);
         auto ave_window = std::max((int)(this->_trait_block_ticks * 0.1), 2);// #検出用の平均フィルタは0.1*len(tone)//2だけずれてる。個々を直したらtbskmodem#TbskModulatorも直せ
         this->_avefilter = make_unique<AverageInterator>(cof, ave_window);
         this->_last_data = 0;

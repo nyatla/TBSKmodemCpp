@@ -5,7 +5,6 @@
 #include "../../streams/BitStream.h"
 #include "../../utils/SumIterator.h"
 #include "../../types/types.h"
-#include "../../utils/math/corrcoef/SelfCorrcoefIterator.h"
 #include <deque>
 #include <cmath>
 

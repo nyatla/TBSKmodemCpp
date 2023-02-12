@@ -151,7 +151,9 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BufferedIterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\FloatConverter.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\ISelfCorrcoefIterator.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.h" />
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator2.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.h" />
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\recoverable.h" />
@@ -186,6 +188,7 @@
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\BitsWidthConvertIterator.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\FloatConverter.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator.cpp" />
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator2.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\MSequence.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\XorShiftRand31.cpp" />
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\RingBuffer.cpp" />

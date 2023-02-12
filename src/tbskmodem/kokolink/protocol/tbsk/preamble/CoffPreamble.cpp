@@ -8,6 +8,7 @@
 #include "../../../utils/AverageInterator.h"
 #include "../../../utils/BufferedIterator.h"
 #include "../../../utils/RingBuffer.h"
+#include "../../../utils/math/corrcoef/SelfCorrcoefIterator2.h"
 
 
 namespace TBSKmodemCPP
@@ -74,7 +75,7 @@ namespace TBSKmodemCPP
         const int _sample_width;
         int _co_step;
         CoffPreamble& _parent;
-        //SelfCorrcoefIterator _scofiter;
+
         shared_ptr<BufferedIterator<double>> _cof;
         unique_ptr<AverageInterator> _avi;
         //AverageInterator _avi;
@@ -92,9 +93,9 @@ namespace TBSKmodemCPP
             _sample_width{ parent._cycle + 1 },
             _co_step{ 0 },
             _parent{ parent },
-            //_scofiter{ SelfCorrcoefIterator(this->_symbol_ticks, src, this->_symbol_ticks) },
+
             _cof{make_shared<BufferedIterator<double>>(
-                make_shared<SelfCorrcoefIterator>(this->_symbol_ticks, src, this->_symbol_ticks), this->_symbol_ticks * (6 + parent._cycle * 2), 0)
+                make_shared<SelfCorrcoefIterator2>(this->_symbol_ticks, src, this->_symbol_ticks), this->_symbol_ticks * (6 + parent._cycle * 2), 0)
             },
             _avi{make_unique<AverageInterator>(this->_cof, this->_symbol_ticks)},
             _rb{make_unique<RingBuffer<double>>(this->_symbol_ticks * this->_sample_width, 0) },
