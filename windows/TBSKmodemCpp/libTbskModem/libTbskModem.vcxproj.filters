@@ -48,13 +48,7 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\types.h">
       <Filter>kokolink\types</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\recoverable.h">
-      <Filter>kokolink\types</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\BufferedIterator.h">
-      <Filter>kokolink\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.h">
       <Filter>kokolink\utils</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\RingBuffer.h">
@@ -115,9 +109,6 @@
       <Filter>kokolink\utils\wavefile</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\tbskmodem\tbskmodem.h" />
-    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.h">
-      <Filter>kokolink\utils</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\types\Py__interface__.h">
       <Filter>kokolink\types</Filter>
     </ClInclude>
@@ -151,6 +142,18 @@
     <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\ISelfCorrcoefIterator.h">
       <Filter>kokolink\utils\math\corrcoef</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\AverageInterator.h">
+      <Filter>kokolink\utils\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\math\SumIterator.h">
+      <Filter>kokolink\utils\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\utils\recoverable.h">
+      <Filter>kokolink\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\AlgorithmSwitch.h">
+      <Filter>kokolink\tbsk</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\interfaces.h">
@@ -173,9 +176,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\traitblockcoder.cpp">
       <Filter>kokolink\tbsk</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\SumIterator.cpp">
-      <Filter>kokolink\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\protocol\tbsk\tbskmodem.cpp">
       <Filter>kokolink\tbsk</Filter>
@@ -222,9 +222,6 @@
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\wavefile\PcmData.cpp">
       <Filter>kokolink\utils\wavefile</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\AverageInterator.cpp">
-      <Filter>kokolink\utils</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\cpp_debug.cpp">
       <Filter>kokolink</Filter>
     </ClCompile>
@@ -239,6 +236,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\corrcoef\SelfCorrcoefIterator2.cpp">
       <Filter>kokolink\utils\math\corrcoef</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\AverageInterator.cpp">
+      <Filter>kokolink\utils\math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\tbskmodem\kokolink\utils\math\SumIterator.cpp">
+      <Filter>kokolink\utils\math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

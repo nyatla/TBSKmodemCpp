@@ -8,13 +8,13 @@
 #include "./preamble/CoffPreamble.h"
 
 #include <memory>
-
-
+#include <vector>
 
 
 
 namespace TBSKmodemCPP
 {
+
 
     // """ TBSKの変調クラスです。
     //     プリアンブルを前置した後にビットパターンを置きます。
@@ -26,12 +26,12 @@ namespace TBSKmodemCPP
         class DiffBitEncoder : public BasicRoStream<int>, virtual public IBitStream
         {
         private:
-            const shared_ptr<IRoStream<int>> _src;
+            const std::shared_ptr<IRoStream<int>> _src;
             int _last_bit;
             bool _is_eos;
             int _pos;
         public:
-            DiffBitEncoder(int firstbit, const shared_ptr<IRoStream<int>>& src) :BasicRoStream(),
+            DiffBitEncoder(int firstbit, const std::shared_ptr<IRoStream<int>>& src) :BasicRoStream(),
                 _src{ src }
             {
                 this->_last_bit = firstbit;
@@ -75,7 +75,7 @@ namespace TBSKmodemCPP
             {
                 return  this->_pos;
             }
-            unique_ptr<vector<int>> Gets(int maxsize, bool fillup)override {
+            unique_ptr<std::vector<int>> Gets(int maxsize, bool fillup)override {
                 return BasicRoStream<int>::Gets(maxsize, fillup);
             }
             void Seek(int size)override {
@@ -84,16 +84,18 @@ namespace TBSKmodemCPP
         };
 #pragma warning( default : 4250 )
     protected:
-        const shared_ptr<const TraitTone> _tone;
-        const shared_ptr<const Preamble> _preamble;
-        const shared_ptr<TraitBlockEncoder> _enc;
+        const std::shared_ptr<const TraitTone> _tone;
+        const std::shared_ptr<const Preamble> _preamble;
+        const std::shared_ptr<TraitBlockEncoder> _enc;
 
-        static shared_ptr<IBitStream> createDiffBitEncoder(int firstbit, const shared_ptr<IRoStream<int>>& src);
     public:
-        TbskModulator_impl(const shared_ptr<const TraitTone>& tone, const shared_ptr<const Preamble>& preamble);
+        /**
+        * suffixはemptyを設定することでnullと同じになります。
+        */
+        TbskModulator_impl(const std::shared_ptr<const TraitTone>& tone, const std::shared_ptr<const Preamble>& preamble);
         virtual ~TbskModulator_impl();
     public:
-        shared_ptr<IPyIterator<double>> ModulateAsBit(const shared_ptr<IRoStream<int>>& src);
+        shared_ptr<IPyIterator<double>> ModulateAsBit(const std::shared_ptr<IRoStream<int>>& src, const std::shared_ptr<IPyIterator<double>>& suffix, bool suffix_pad);
     };
 }
 
@@ -101,21 +103,21 @@ namespace TBSKmodemCPP
 {
     class TbskDemodulator_impl;
 
-    class AsyncDemodulateX :public virtual AsyncMethod<shared_ptr<TraitBlockDecoder>>
+    class AsyncDemodulateX :public virtual AsyncMethod<std::shared_ptr<TraitBlockDecoder>>
     {
     private:
         TbskDemodulator_impl& _parent;
         const int _tone_ticks;
-        shared_ptr<RoStream<double>> _stream;
+        std::shared_ptr<RoStream<double>> _stream;
         bool _closed;
         NullableResult<TBSK_INT64> _peak_offset;
         int _co_step;
-        shared_ptr<TraitBlockDecoder> _result;
-        shared_ptr<WaitForSymbolAS> _wsrex;
+        std::shared_ptr<TraitBlockDecoder> _result;
+        std::shared_ptr<WaitForSymbolAS> _wsrex;
     public:
-        AsyncDemodulateX(TbskDemodulator_impl& parent, const shared_ptr<IPyIterator<double>>& src);
+        AsyncDemodulateX(TbskDemodulator_impl& parent, const std::shared_ptr<IPyIterator<double>>& src);
         virtual ~AsyncDemodulateX();
-        shared_ptr<TraitBlockDecoder> GetResult() override;
+        std::shared_ptr<TraitBlockDecoder> GetResult() override;
         void Close()override;
         bool Run()override;
     };
@@ -125,41 +127,21 @@ namespace TBSKmodemCPP
     protected:
 
         friend AsyncDemodulateX;
-        const shared_ptr<const TraitTone> _tone;
-        const shared_ptr<Preamble> _pa_detector;
+        const std::shared_ptr<const TraitTone> _tone;
+        const std::shared_ptr<Preamble> _pa_detector;
         bool _asmethod_lock;
         //""" TBSK信号からビットを復元します。
         //    関数は信号を検知する迄制御を返しません。信号を検知せずにストリームが終了した場合はNoneを返します。
         //"""
     public:
-        TbskDemodulator_impl(const shared_ptr<TraitTone>& tone, const shared_ptr<Preamble>& preamble);
+        TbskDemodulator_impl(const std::shared_ptr<const TraitTone>& tone, const std::shared_ptr<Preamble>& preamble);
 
     public:
-        shared_ptr<IPyIterator<int>> DemodulateAsBit(const shared_ptr<IPyIterator<double>>& src);
+        shared_ptr<IPyIterator<int>> DemodulateAsBit(const std::shared_ptr<IPyIterator<double>>& src);
     };
 
-    /*
-    class DemodulateAsBitAS :public AsyncDemodulateX<std::shared_ptr<IPyIterator<int>>> {
-    public:
-        DemodulateAsBitAS(TbskDemodulator_impl& parent, const std::shared_ptr<IPyIterator<double>>& src);
-        std::shared_ptr<IPyIterator<int>> ConvertResult(std::shared_ptr<TraitBlockDecoder>& r)const override;
-    };
 
-    class DemodulateAsIntAS :public AsyncDemodulateX<std::shared_ptr<IPyIterator<int>>> {
-    private:
-        int _bitwidth;
-    public:
-        DemodulateAsIntAS(TbskDemodulator_impl& parent, const std::shared_ptr<IPyIterator<double>>& src, int bitwidth);
-        std::shared_ptr<IPyIterator<int>> ConvertResult(std::shared_ptr<TraitBlockDecoder>& r)const override;
-    };
 
-    class DemodulateAsCharAS :public AsyncDemodulateX<std::shared_ptr<IPyIterator<char>>>
-    {
-    public:
-        DemodulateAsCharAS(TbskDemodulator_impl& parent, const std::shared_ptr<IPyIterator<double>>& src);
-        std::shared_ptr<IPyIterator<char>> ConvertResult(std::shared_ptr<TraitBlockDecoder>& r)const override;
-    };
-    */
 
 
 }

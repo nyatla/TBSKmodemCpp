@@ -5,10 +5,11 @@
 #include "../../../streams/BitStream.h"
 #include "../../../compatibility.h"
 #include "../../../utils/recoverable.h"
-#include "../../../utils/AverageInterator.h"
+#include "../../../utils/math/AverageInterator.h"
 #include "../../../utils/BufferedIterator.h"
 #include "../../../utils/RingBuffer.h"
 #include "../../../utils/math/corrcoef/SelfCorrcoefIterator2.h"
+#include "../AlgorithmSwitch.h"
 
 
 namespace TBSKmodemCPP
@@ -95,7 +96,7 @@ namespace TBSKmodemCPP
             _parent{ parent },
 
             _cof{make_shared<BufferedIterator<double>>(
-                make_shared<SelfCorrcoefIterator2>(this->_symbol_ticks, src, this->_symbol_ticks), this->_symbol_ticks * (6 + parent._cycle * 2), 0)
+                AlgorithmSwitch::createSelfCorrcoefIterator(this->_symbol_ticks, src, this->_symbol_ticks), this->_symbol_ticks * (6 + parent._cycle * 2), 0)
             },
             _avi{make_unique<AverageInterator>(this->_cof, this->_symbol_ticks)},
             _rb{make_unique<RingBuffer<double>>(this->_symbol_ticks * this->_sample_width, 0) },

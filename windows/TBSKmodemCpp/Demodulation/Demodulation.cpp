@@ -14,10 +14,8 @@ using namespace std;
 int main()
 {
 	{
-		auto tone = make_shared<XPskSinTone>(10, 10);//10 point/cycle * 100 
-		tone->Mul(0.5);
-		auto preamble = make_shared<CoffPreamble>(tone);
-		auto mod = make_shared<TbskModulator>(tone, preamble);
+		shared_ptr<TraitTone> tone = TbskTone::CreateXPskSin();//10 point/cycle * 100 
+		auto mod = make_shared<TbskModulator>(tone);
 		std::vector<int> bytes;
 		for (int i = 0;i < 16*4;i++) {
 			bytes.push_back(0);
@@ -33,7 +31,7 @@ int main()
 			FileWriter fw("./test2.wav");
 			PcmData::Dump(pcm, fw);
 		}
-		auto dem = std::make_shared<TbskDemodulator>(tone, preamble);
+		auto dem = std::make_shared<TbskDemodulator>(tone);
 		{
 
 			FileReader fr("./test2.wav");

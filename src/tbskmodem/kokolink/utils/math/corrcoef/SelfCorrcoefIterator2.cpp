@@ -112,26 +112,32 @@ namespace TBSKmodemCPP
         auto meanx_ = sumxi_ / (this->n);
         auto sumxi2_ = ((double)this->sumxi2) / (1 << FP);
         auto v = (sumxi2_ + (meanx_ * meanx_) * this->n - 2 * meanx_ * sumxi_);
-        if (v < 0)
+        if (v <= 0)
         {
-            v = 0;
+            return 0;
         }
         auto stdx = sqrt(v / (this->n - 1));
-
+        if (stdx < (1.0 / (1 << FP)))
+        {
+            return 0.;
+        }
         auto sumyi_ = ((double)this->sumyi) / (1 << FP);
         auto meany_ = sumyi_ / (this->n);
         auto sumyi2_ = ((double)this->sumyi2) / (1 << FP);
         v = (sumyi2_ + (meany_ * meany_) * this->n - 2 * meany_ * sumyi_);
-        if (v < 0)
+        if (v <= 0)
         {
-            v = 0;
+            return 0;
         }
         auto stdy = sqrt(v / (this->n - 1));
-
+        if (stdy < (1.0 / (1 << FP)))
+        {
+            return 0.;
+        }
         auto sumxiyi_ = ((double)this->sumxiyi) / (1 << FP);
         v = sumxiyi_ + this->n * meanx_ * meany_ - meany_ * sumxi_ - meanx_ * sumyi_;
         auto covxy = v / (this->n - 1);
-        auto r = stdx * stdy == 0 ? 0 : covxy / (stdx * stdy);
+        auto r = covxy / (stdx * stdy);
 
         return r > 1 ? 1.f : (r < -1 ? -1 : r);
     }

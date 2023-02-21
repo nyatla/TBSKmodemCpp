@@ -14,7 +14,7 @@ namespace TBSKmodemCPP
     using std::make_shared;
     using std::max;
 
-    TbskModulator_impl::TbskModulator_impl(const shared_ptr<const TraitTone>& tone, const shared_ptr<const Preamble>& preamble) :
+    TbskModulator_impl::TbskModulator_impl(const shared_ptr<const TraitTone>& tone, const shared_ptr<const Preamble>& preamble):
         _tone{ tone },
         _preamble{ preamble },
         _enc{ make_shared<TraitBlockEncoder>(tone) }
@@ -23,17 +23,23 @@ namespace TBSKmodemCPP
     TbskModulator_impl::~TbskModulator_impl() {
     }
 
-    shared_ptr<IPyIterator<double>> TbskModulator_impl::ModulateAsBit(const shared_ptr<IRoStream<int>>& src)
+    shared_ptr<IPyIterator<double>> TbskModulator_impl::ModulateAsBit(const shared_ptr<IRoStream<int>>& src,const shared_ptr<IPyIterator<double>>& suffix, bool suffix_pad)
     {
         auto ave_window_shift = max((int)(this->_tone->size() * 0.1), 2) / 2; //#検出用の平均フィルタは0.1*len(tone)//2だけずれてる。ここを直したらTraitBlockDecoderも直せ
 
         auto& tbe = this->_enc;
         tbe->SetInput(make_shared<DiffBitEncoder>(0, src));
-        vector <shared_ptr<IPyIterator<double>>> d{
-            this->_preamble->GetPreamble(),
-            tbe,
-            make_shared<Repeater<double>>(0, ave_window_shift)
-        };
+        vector <shared_ptr<IPyIterator<double>>> d;
+        d.push_back(this->_preamble->GetPreamble());
+        d.push_back(tbe);
+
+        if (suffix) {
+            d.push_back(suffix);
+
+        }
+        if (suffix_pad) {
+            d.push_back(make_shared<Repeater<double>>(0, ave_window_shift));
+        }
         return make_shared<IterChain<double>>(d);
     }
 }
@@ -162,7 +168,7 @@ namespace TBSKmodemCPP
     }
 
 
-    TbskDemodulator_impl::TbskDemodulator_impl(const shared_ptr<TraitTone>& tone, const shared_ptr<Preamble>& preamble) :
+    TbskDemodulator_impl::TbskDemodulator_impl(const shared_ptr<const TraitTone>& tone, const shared_ptr<Preamble>& preamble) :
         _pa_detector{ preamble },
         _tone{ tone }
     {

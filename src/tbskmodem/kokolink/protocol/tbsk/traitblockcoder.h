@@ -3,7 +3,7 @@
 #include "./toneblock.h"
 #include "../../streams/rostreams.h"
 #include "../../streams/BitStream.h"
-#include "../../utils/SumIterator.h"
+#include "../../utils/math/SumIterator.h"
 #include "../../types/types.h"
 #include <deque>
 #include <cmath>

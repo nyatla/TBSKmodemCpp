@@ -12,11 +12,13 @@ namespace TBSKmodemCPP
     using std::make_shared;
     using std::dynamic_pointer_cast;
 
-    TbskDemodulator::TbskDemodulator(const shared_ptr<TraitTone>& tone) :TbskDemodulator_impl(tone, make_shared<CoffPreamble>(tone)) {
-    };
+    TbskDemodulator::TbskDemodulator(const shared_ptr<const TraitTone>& tone, double preamble_th, int preamble_cycle):
+        TbskDemodulator(tone, make_shared<CoffPreamble>(tone,preamble_th,preamble_cycle))
+    {
+    }
 
 
-    TbskDemodulator::TbskDemodulator(const shared_ptr<TraitTone>& tone, const shared_ptr<Preamble>& preamble) :TbskDemodulator_impl(tone, preamble) {
+    TbskDemodulator::TbskDemodulator(const shared_ptr<const TraitTone>& tone, const shared_ptr<Preamble>& preamble) :TbskDemodulator_impl(tone, preamble) {
     }
 
 

@@ -14,8 +14,8 @@ namespace TBSKmodemCPP
     {
 
     public:
-        TbskDemodulator(const std::shared_ptr<TraitTone>& tone, const std::shared_ptr<Preamble>& preamble);
-        TbskDemodulator(const std::shared_ptr<TraitTone>& tone);
+        TbskDemodulator(const std::shared_ptr<const TraitTone>& tone, double preamble_th=CoffPreamble::DEFAULT_TH, int preamble_cycle=CoffPreamble::DEFAULT_CYCLE);
+        TbskDemodulator(const std::shared_ptr<const TraitTone>& tone, const std::shared_ptr<Preamble>& preamble);
 
     public:
         std::shared_ptr<IPyIterator<int>> DemodulateAsBit(const std::shared_ptr<IPyIterator<double>>& src);
