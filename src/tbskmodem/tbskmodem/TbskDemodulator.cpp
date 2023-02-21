@@ -57,7 +57,12 @@ namespace TBSKmodemCPP
         TBSK_ASSERT(!this->_asmethod_lock);
         try {
             auto r=TbskDemodulator_impl::DemodulateAsBit(src);
-            return make_shared<BitsWidthConvertIterator>(r,1, bitwidth);
+            if (r) {
+                return make_shared<BitsWidthConvertIterator>(r, 1, bitwidth);
+            }
+            else {
+                return shared_ptr<IPyIterator<int>>();
+            }
         }
         catch (RecoverableException<AsyncDemodulateX>& e) {
             auto a = make_shared<AsyncDemodulateAsInt>(e.Detach(), bitwidth);
@@ -112,7 +117,12 @@ namespace TBSKmodemCPP
         TBSK_ASSERT(!this->_asmethod_lock);
         try {
             auto r = TbskDemodulator_impl::DemodulateAsBit(src);
-            return make_shared<CharIterator>(r);
+            if (r) {
+                return make_shared<CharIterator>(r);
+            }
+            else {
+                return shared_ptr<IPyIterator<char>>();
+            }
         }
         catch (RecoverableException<AsyncDemodulateX>& e) {
             auto a = make_shared<AsyncDemodulateAsChar>(e.Detach());
