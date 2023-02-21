@@ -275,19 +275,27 @@ extern "C" {
     //  TbskModulator
     //
 
-    EXTERN_C shared_ptr<TbskModulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator(const shared_ptr<TraitTone>* tone, const shared_ptr<Preamble>* preamble)
+    //will be deplicate!
+    EXTERN_C shared_ptr<TbskModulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_A(const shared_ptr<TraitTone>* tone,int preamble_cycle)
+    {
+        //tone,preambleを生成
+        auto r = std::make_shared<TbskModulator>(*tone, preamble_cycle);
+        return (shared_ptr<TbskModulator>*)_instances.Add(r);
+    }
+    EXTERN_C shared_ptr<TbskModulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_B(const shared_ptr<TraitTone>* tone, const shared_ptr<Preamble>* preamble)
     {
         //tone,preambleを生成
         auto r = std::make_shared<TbskModulator>(*tone, *preamble);
         return (shared_ptr<TbskModulator>*)_instances.Add(r);
     }
+
     /**
     *   戻り値はdisposeする必要があります。
     */
-    EXTERN_C shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_Modulate_A(const shared_ptr<TbskModulator>* ptr, const shared_ptr<InputIterator<int>>* src)
+    EXTERN_C shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_Modulate(const shared_ptr<TbskModulator>* ptr, const shared_ptr<InputIterator<int>>* src,bool stopsymbol)
     {
         const shared_ptr<TbskModulator>& ref = *ptr;
-        auto m = ref->Modulate((*src));//例外を吐くなら注意!
+        auto m = ref->Modulate((*src),stopsymbol);//例外を吐くなら注意!
         auto r = std::make_shared<OutputIterator<double>>(m);
         return (shared_ptr<OutputIterator<double>>*)_instances.Add(r);
     }
@@ -297,10 +305,16 @@ extern "C" {
     //
     //  TbskDemodulator
     //
+    EXTERN_C shared_ptr<TbskDemodulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_A(const shared_ptr<TraitTone>* tone_ptr,double preambe_th,int preamble_cycle)
+    {
+        //tone,preambleを生成
+
+        auto r = std::make_shared<TbskDemodulator>(*tone_ptr, preambe_th, preamble_cycle);
+        return (shared_ptr<TbskDemodulator>*)_instances.Add(r);
+    }
 
 
-
-    EXTERN_C shared_ptr<TbskDemodulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator(const shared_ptr<TraitTone>* tone_ptr, const shared_ptr<Preamble>* preamble_ptr)
+    EXTERN_C shared_ptr<TbskDemodulator>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskDemodulator_B(const shared_ptr<TraitTone>* tone_ptr, const shared_ptr<Preamble>* preamble_ptr)
     {
         //tone,preambleを生成
 
@@ -325,7 +339,7 @@ extern "C" {
             auto r = std::make_shared<OutputIterator<int>>(m);
             return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
         }
-        catch (RecoverableException<DemodulateAsBitAS>& e) {
+        catch (RecoverableException<AsyncDemodulateX>& e) {
             e.Close();
             return NULL;
         }
@@ -339,12 +353,12 @@ extern "C" {
     struct DemodulateResult{
         int type;
         shared_ptr<IPyIterator<int>> iter;
-        shared_ptr<DemodulateAsIntAS> recover;
+        shared_ptr<AsyncDemodulateX> recover;
         void setIPyIterator(const shared_ptr<IPyIterator<int>>& v) {
             this->type = 1;
             this->iter= v;
         }
-        void setDemodulateResult(const shared_ptr<DemodulateAsIntAS>& v) {
+        void setDemodulateResult(const shared_ptr<AsyncDemodulateX>& v) {
             this->type = 2;
             this->recover = v;
         }
@@ -365,7 +379,7 @@ extern "C" {
             r->setIPyIterator(m);
             return (shared_ptr<struct DemodulateResult>*)_instances.Add(r);
         }
-        catch (RecoverableException<DemodulateAsIntAS>& e) {
+        catch (RecoverableException<AsyncDemodulateX>& e) {
             //ストリームの中断を検知した場合
             auto r = std::make_shared<struct DemodulateResult>();
             r->setDemodulateResult(e.Detach());
@@ -458,7 +472,7 @@ extern "C" {
         return (*ptr)->GetByteslen();
     }
     EXTERN_C const shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_PcmData_DataAsFloat(const shared_ptr<PcmData>* ptr) {
-        const std::shared_ptr<std::vector<double>> r = std::move((*ptr)->DataAsFloat());
+        const std::shared_ptr<const std::vector<double>> r = std::move((*ptr)->DataAsFloat());
         auto iter_=std::make_shared<PyIterator<double>>(r);
         return (shared_ptr<OutputIterator<double>>*)_instances.Add(std::make_shared<OutputIterator<double>>(iter_));
     }

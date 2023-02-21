@@ -224,14 +224,14 @@ function TBSKmodem_api_load_()
          * @param {Tone} tone
          * @param {Preamble} preamble
          */
-        constructor(tone, preamble) {
-            super(MOD._wasm_tbskmodem_TbskModulator(tone._wasm_instance, preamble._wasm_instance));
+        constructor(tone, preamble_cycle = 4) {            
+            super(MOD._wasm_tbskmodem_TbskModulator_A(tone._wasm_instance, preamble_cycle));
         }
         /**
          * @param {array[uint8]|string} src
          * @return {FloatArray}
          */
-        modulate(src) {
+        modulate(src,stopsymbol=true) {
             var buf = new IntInputIterator();
             try {
                 if (typeof (src) == "string") {
@@ -241,7 +241,7 @@ function TBSKmodem_api_load_()
                     buf.puts(src);
                 }
                 //int*を渡して、[int,float...]のポインタを返してもらう。
-                let wi = MOD._wasm_tbskmodem_TbskModulator_Modulate_A(this._wasm_instance, buf._wasm_instance);
+                let wi = MOD._wasm_tbskmodem_TbskModulator_Modulate(this._wasm_instance, buf._wasm_instance, stopsymbol);
                 if (wi == null) {
                     throw new Error();
                 }
@@ -279,8 +279,8 @@ function TBSKmodem_api_load_()
          * @param {Tone} tone
          * @param {Preamble} preamble
          */
-        constructor(tone, preamble) {
-            super(MOD._wasm_tbskmodem_TbskDemodulator(tone._wasm_instance, preamble._wasm_instance));
+        constructor(tone, preamble_th=1.,preamble_cycle=4) {
+            super(MOD._wasm_tbskmodem_TbskDemodulator_A(tone._wasm_instance, preamble_th, preamble_cycle));
         }
         /**
          * 
@@ -372,14 +372,14 @@ function TBSKmodem_api_load_()
          * @param {Tone} tone
          * @param {Preamble} preamble
          */
-        constructor(tone, preamble, events = {}, decoder = undefined) {
+        constructor(tone, preamble_th=1.0,preamble_cycle=4, events = {}, decoder = undefined) {
             super();
             if (!("onStart" in events)) { events.onStart = null; }
             if (!("onData" in events)) { events.onData = null; }
             if (!("onEnd" in events)) { events.onEnd = null; }
             let _t = this;
             this._decoder = decoder == "utf8" ? new Utf8Decoder() : new PassDecoder();
-            this._demod=new TbskDemodulator(tone, preamble);
+            this._demod = new TbskDemodulator(tone, preamble_th, preamble_cycle);
             this._input_buf = new DoubleInputIterator(true);
             this._callOnStart = () => {
                 new Promise((resolve) => {
@@ -558,7 +558,7 @@ function TBSKmodem_api_load_()
         }
 
     }
-    const JSBIND_VERSION = "JSBind/0.1.0";
+    const JSBIND_VERSION = "JSBind/0.1.1";
     MOD.tbskmodem = {
         VERSION: (() => {
             return JSBIND_VERSION+";TBSKmodemCPP/" + MOD._wasm_tbskmodem_VERSION(0) + "." + MOD._wasm_tbskmodem_VERSION(1) + "." + MOD._wasm_tbskmodem_VERSION(2);

@@ -14,8 +14,7 @@
                 //  TBSK modem
                 let tj = Module.tbskmodem;
                 var tone = new tj.XPskSinTone(10,10);
-                var preamble = new tj.CoffPreamble(tone);
-                let mod = new tj.TbskModulator(tone, preamble);
+                let mod = new tj.TbskModulator(tone);
                 console.log("pointers:"+tj.getPointerHolderSize());
                 let farray = mod.modulate("スーパーウルトラセクシーヒーローZAN");
                 console.log(farray.length);
@@ -44,7 +43,7 @@
 */
                 //listener test
                 console.log("listener");
-                let listener = new tj.TbskListener(tone, preamble, { onData: (d) => { console.log(d); } },"utf8");
+                let listener = new tj.TbskListener(tone,1,4, { onData: (d) => { console.log(d); } },"utf8");
                 console.log("#1");
                 listener.push(farray);
                 console.log("#2");
