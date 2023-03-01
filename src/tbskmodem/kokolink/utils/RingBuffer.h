@@ -9,11 +9,35 @@ namespace TBSKmodemCPP
 
 
 
-    template <typename T> class RingBuffer:public NoneCopyConstructor_class
+    template <typename T> class RingBuffer :public NoneCopyConstructor_class
     {
     private:
-        vector<T> _buf;
+        std::vector<T> _buf;
         int _p;
+    private:
+        class SubIterator :public IPyIterator<T>
+        {
+        private:
+            int _size;
+            int _pos;
+            const std::vector<T>& _buf;
+
+        public:
+            SubIterator(const std::vector<T>& buf, int pos, int size) :_pos{ pos }, _size{ size }, _buf{ buf } {
+                assert(size < buf.size());
+            }
+            T Next()override
+            {
+                if (this->_size < 1) {
+                    throw PyStopIteration();
+                }
+                this->_size = this->_size - 1;
+                int p = this->_pos;
+                this->_pos = (this->_pos + 1) % this->_buf.size();
+                return this->_buf.at(p);
+            }
+        };
+
     public:
         RingBuffer(size_t length, const T pad)
         {
@@ -40,60 +64,20 @@ namespace TBSKmodemCPP
                 this->Append(*(buf + i));
             }
         }
-        ///** リストの一部を切り取って返します。
-        //    この関数はバッファの再配置を行いません。
-        //*/    
-        unique_ptr<vector<T>> Sublist(int pos, int size)const
+
+        /// <summary>
+        /// この関数は、posからsizeの要素を参照するイテレータを返します。
+        /// イテレータの生存期間はこのインスタンスと同じです。
+        /// バッファ操作を行う関数を使用すると、イテレータの返り値は影響を受けます。
+        /// </summary>
+        /// <param name="pos"></param>
+        /// <param name="size"></param>
+        /// <returns></returns>
+        std::unique_ptr<IPyIterator<T>> SubIter(int pos, int size)const
         {
-            auto& buf = this->_buf;
-            const auto l = this->_buf.size();
-            if (pos >= 0) {
-                const auto p = this->_p + pos;
-                if (size >= 0) {
-                    TBSK_ASSERT(pos + size <= l);
-                    auto ret = make_unique<vector<T>>(size);
-                    auto ret_ptr = ret.get();
-                    
-                    for (auto i = 0;i < size;i++) {
-                        ret_ptr->at(i) = buf[(p + i) % l];
-                    }
-                    return ret;
-                }
-                else {
-                    TBSK_ASSERT(pos + size + 1 >= 0);
-                    auto ret = make_unique<vector<T>>(-size);
-                    auto ret_ptr = ret.get();
-                    // return tuple([self._buf[(p+size+i+1)%l] for i in range(-size)])
-                    for (auto i = 0;i < -size;i++) {
-                        ret_ptr->at(i) = buf[(p + size + i + 1) % l];
-                    }
-                    return ret;
-                }
-            }
-            else {
-                auto p = this->_p + l + pos;
-                if (size >= 0) {
-                    TBSK_ASSERT(l + pos + size <= l);
-                    // return tuple([self._buf[(p+i)%l] for i in range(size)])
-                    auto ret = make_unique<vector<T>>(size);
-                    auto ret_ptr = ret.get();
-                    for (auto i = 0;i < size;i++) {
-                        ret_ptr->at(i) = buf[(p + i) % l];
-                    }
-                    return ret;
-                }
-                else {
-                    TBSK_ASSERT(l + pos + size + 1 >= 0);
-                    // return tuple([self._buf[(p-i+l)%l] for i in range(-size)])
-                    auto ret = make_unique<vector<T>>(size);
-                    auto ret_ptr = ret.get();
-                    for (auto i = 0;i < -size;i++) {
-                        ret_ptr->at(i) = buf[(p - i + l) % l];
-                    }
-                    return ret;
-                }
-            }
+            return std::make_unique<SubIterator>(this->_buf, (pos+this->_p)%((int)this->_buf.size()), size);
         }
+
         T GetTail()const {
             auto length = this->_buf.size();
             return this->_buf[(this->_p - 1 + length) % length];

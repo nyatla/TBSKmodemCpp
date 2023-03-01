@@ -263,8 +263,9 @@ namespace TBSKmodemCPP
                         //# #ピーク周辺の読出し
                         //# [next(cof) for _ in range(symbol_ticks//4)]
                         //# バッファリングしておいた相関値に3値平均フィルタ
-                        const auto& buf_s = cof->GetBuf().Sublist((int)(cof->GetBuf().GetLength() - symbol_ticks), symbol_ticks);//buf = cof.buf[-symbol_ticks:]
-                        auto buf = buf_s.get();
+                        auto buf=Functions::ToVector(cof->GetBuf().SubIter((int)(cof->GetBuf().GetLength() - symbol_ticks), symbol_ticks));
+
+
                         //var b =[(i + self._nor - symbol_ticks + 1, buf[i] + buf[i + 1] + buf[2]) for i in range(len(buf) - 2)];// #位置,相関値
                         struct TPcTuple {
                             int pos;
@@ -280,7 +281,7 @@ namespace TBSKmodemCPP
                         for (auto i = 0; i < buf->size() - 2; i++)
                         {
                             b[i].pos = i + this->_nor - symbol_ticks + 1;
-                            b[i].cof = buf->at(i) + buf->at((size_t)i + 1) + buf->at(2);
+                            b[i].cof = buf->at(i) + buf->at((size_t)i + 1) + buf->at((size_t)i + 2);
                             //b.Add((i + this._nor - symbol_ticks + 1, buf[i] + buf[i + 1] + buf[2]));
                         }
                         //var b.sort(key = lambda x: x[1], reverse = True);
@@ -292,7 +293,8 @@ namespace TBSKmodemCPP
                         //# Lレベルシンボルの範囲を得る
                         //# s=peak_pos-symbol_ticks*3-(self._nor-cofbuf_len)
                         auto s = peak_pos - symbol_ticks * sample_width - (this->_nor - cofbuf_len);
-                        const auto& lw_s = cof->GetBuf().Sublist(s, cycle * symbol_ticks);
+
+                        auto lw_s=Functions::ToVector(cof->GetBuf().SubIter(s, cycle* symbol_ticks));
                         auto lw = lw_s.get();
 
                         vector_sort(lw);
@@ -313,8 +315,10 @@ namespace TBSKmodemCPP
                         //#Hレベルシンボルの範囲を得る
                         //# s=peak_pos-symbol_ticks*6-(self._nor-cofbuf_len)
                         s = peak_pos - symbol_ticks * sample_width * 2 - (this->_nor - cofbuf_len);
-                        const auto& lh_s = cof->GetBuf().Sublist(s, cycle * symbol_ticks);
+
+                        auto lh_s = Functions::ToVector(cof->GetBuf().SubIter(s, cycle * symbol_ticks));
                         auto lh = lh_s.get();
+
                         vector_sort(lh, true);
                         //auto lhlen = (int)(lh->size()) * 3 / 2 + 1;
                         auto lhlen = (int)(lh->size());

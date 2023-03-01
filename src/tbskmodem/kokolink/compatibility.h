@@ -118,6 +118,10 @@ namespace TBSKmodemCPP
         {
             return ToVector(src.get());
         }
+        template <typename T> shared_ptr<vector<T>> ToVector(const unique_ptr<IPyIterator<T>>& src)
+        {
+            return ToVector(src.get());
+        }
 
         //template <typename T> IPyIterator < T ToPyIterator(shared_ptr<vector<T>>& src) {
         //    return make_unique<PyIterator<T>>(src);
