@@ -7,7 +7,28 @@
 
 namespace TBSKmodemCPP
 {
+    class AsyncDemodulateAsInt :public virtual AsyncMethod<shared_ptr<IPyIterator<int>>>
+    {
+    private:
+        const shared_ptr<AsyncDemodulateX> _inst;
+        int _bitwidth;
+    public:
+        AsyncDemodulateAsInt(const shared_ptr<AsyncDemodulateX>& inst, int bitwidth);
+        shared_ptr<IPyIterator<int>> GetResult()override;
+        void Close()override;
+        bool Run()override;
+    };
     
+    class AsyncDemodulateAsChar :public virtual AsyncMethod<shared_ptr<IPyIterator<char>>>
+    {
+    private:
+        const shared_ptr<AsyncDemodulateX> _inst;
+    public:
+        AsyncDemodulateAsChar(const shared_ptr<AsyncDemodulateX>& inst);
+        shared_ptr<IPyIterator<char>> GetResult()override;
+        void Close()override;
+        bool Run()override;
+    };
 
 
     class TbskDemodulator:public TbskDemodulator_impl

@@ -29,24 +29,17 @@ namespace TBSKmodemCPP
     }
     
 
-    class AsyncDemodulateAsInt :public virtual AsyncMethod<shared_ptr<IPyIterator<int>>>
-    {
-    private:
-        const shared_ptr<AsyncDemodulateX> _inst;
-        int _bitwidth;
-    public:
-        AsyncDemodulateAsInt(const shared_ptr<AsyncDemodulateX>& inst, int bitwidth) :_inst(inst), _bitwidth(bitwidth) {}
-        shared_ptr<IPyIterator<int>> GetResult()override{
-            auto bwf=make_shared<BitsWidthFilter>(1, this->_bitwidth);
-            bwf->SetInput(this->_inst->GetResult());
-            return bwf;
-        };
-        void Close()override {
-            this->_inst->Close();
-        };
-        bool Run()override {
-            return this->_inst->Run();
-        };
+    AsyncDemodulateAsInt::AsyncDemodulateAsInt(const shared_ptr<AsyncDemodulateX>& inst, int bitwidth) :_inst(inst), _bitwidth(bitwidth) {}
+    shared_ptr<IPyIterator<int>> AsyncDemodulateAsInt::GetResult(){
+        auto bwf=make_shared<BitsWidthFilter>(1, this->_bitwidth);
+        bwf->SetInput(this->_inst->GetResult());
+        return bwf;
+    };
+    void AsyncDemodulateAsInt::Close(){
+        this->_inst->Close();
+    };
+    bool AsyncDemodulateAsInt::Run(){
+        return this->_inst->Run();
     };
 
     //    """ TBSK信号からnビットのint値配列を復元します。
@@ -95,22 +88,17 @@ namespace TBSKmodemCPP
 
 
 
-    class AsyncDemodulateAsChar :public virtual AsyncMethod<shared_ptr<IPyIterator<char>>>
-    {
-    private:
-        const shared_ptr<AsyncDemodulateX> _inst;
-    public:
-        AsyncDemodulateAsChar(const shared_ptr<AsyncDemodulateX>& inst) :_inst(inst){}
-        shared_ptr<IPyIterator<char>> GetResult()override {
-            return make_shared<CharIterator>(this->_inst->GetResult());
-        };
-        void Close()override {
-            this->_inst->Close();
-        };
-        bool Run()override {
-            return this->_inst->Run();
-        };
+    AsyncDemodulateAsChar::AsyncDemodulateAsChar(const shared_ptr<AsyncDemodulateX>& inst) :_inst(inst) {}
+    shared_ptr<IPyIterator<char>> AsyncDemodulateAsChar::GetResult(){
+        return make_shared<CharIterator>(this->_inst->GetResult());
     };
+    void AsyncDemodulateAsChar::Close(){
+        this->_inst->Close();
+    };
+    bool AsyncDemodulateAsChar::Run(){
+        return this->_inst->Run();
+    };
+
 
     shared_ptr<IPyIterator<char>> TbskDemodulator::DemodulateAsChar(const shared_ptr<IPyIterator<double>>& src)
     {

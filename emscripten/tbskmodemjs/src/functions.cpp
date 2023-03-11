@@ -295,7 +295,7 @@ extern "C" {
     EXTERN_C shared_ptr<OutputIterator<double>>* EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_TbskModulator_Modulate(const shared_ptr<TbskModulator>* ptr, const shared_ptr<InputIterator<int>>* src,bool stopsymbol)
     {
         const shared_ptr<TbskModulator>& ref = *ptr;
-        auto m = ref->Modulate((*src),stopsymbol);//例外を吐くなら注意!
+        auto m = ref->Modulate((*src), 8,stopsymbol);//例外を吐くなら注意!
         auto r = std::make_shared<OutputIterator<double>>(m);
         return (shared_ptr<OutputIterator<double>>*)_instances.Add(r);
     }
@@ -353,12 +353,12 @@ extern "C" {
     struct DemodulateResult{
         int type;
         shared_ptr<IPyIterator<int>> iter;
-        shared_ptr<AsyncDemodulateX> recover;
+        shared_ptr<AsyncDemodulateAsInt> recover;
         void setIPyIterator(const shared_ptr<IPyIterator<int>>& v) {
             this->type = 1;
             this->iter= v;
         }
-        void setDemodulateResult(const shared_ptr<AsyncDemodulateX>& v) {
+        void setDemodulateResult(const shared_ptr<AsyncDemodulateAsInt>& v) {
             this->type = 2;
             this->recover = v;
         }
@@ -379,7 +379,7 @@ extern "C" {
             r->setIPyIterator(m);
             return (shared_ptr<struct DemodulateResult>*)_instances.Add(r);
         }
-        catch (RecoverableException<AsyncDemodulateX>& e) {
+        catch (RecoverableException<AsyncDemodulateAsInt>& e) {
             //ストリームの中断を検知した場合
             auto r = std::make_shared<struct DemodulateResult>();
             r->setDemodulateResult(e.Detach());
