@@ -13,6 +13,7 @@ namespace TBSKmodemCPP
     {
     public:
         virtual T Next() = 0;
+        virtual ~IPyIterator() {};
     };
 }
 
