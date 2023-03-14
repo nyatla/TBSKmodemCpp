@@ -1,56 +1,105 @@
 # TBSK modem for C++
 
 
-English documente 👉[Readme.en.md](Readme.en.md)
+日本語ドキュメント 👉[README.ja.md](README.ja.md)
 
 
-C++で実装したTBSKmodemです。
+This is C++14 implementation of TBSKmodem. 
+
 🐓[TBSKmodem](https://github.com/nyatla/TBSKmodem)
 
 
-TBSK (Trait Block Shift Keying) modemは、FFT/IFTTを使わない、低速、短距離の音響通信の実装です。
-バイト/ビットストリームの振幅信号への変調、振幅信号からバイト/ビットストリームへの復調ができます。
+
+There are three build environments: Visual Studio, Gcc, and emscripten.
 
 
-![preview_tbsk](https://user-images.githubusercontent.com/2483108/194768184-cecddff0-1fa4-4df8-af3f-f16ed4ef1718.gif)
+# License
+
+This software is provided under the MIT license. For hobby and research purposes, use it according to the MIT license.
+
+For industrial applications, be careful with patents.
+
+This library is MIT licensed open source software, but not patent free.
 
 
-[Youtube](https://www.youtube.com/watch?v=4cB3hWATDUQ)でみる（信号音付きです。）
 
-※Python版のプレビュー
-
-
-## Python版との差分
-
-APIは概ねPythonと同一です。一部、C++の標準クラスライブラリに適合させるための変更があります。
-Emscripten/windows/linuxのプロジェクトファイルがあります。
-
-
-## ライセンス
-
-本ソフトウェアは、MITライセンスで提供します。ホビー・研究用途では、MITライセンスに従って適切に運用してください。
-産業用途では、特許の取り扱いに注意してください。
-
-このライブラリはMITライセンスのオープンソースソフトウェアですが、特許フリーではありません。
-
-## GetStarted
-
-
-### ソースコードのセットアップ
-サンプルを含めたソースコードは、githubからcloneします。
+## Setup
+Clone the source code from Github.
 
 ```
->git clone https://github.com/nyatla/TBSKmodemCpp.git
+>git clone https://github.com/nyatla/TBSKmodemCS.git
 ```
 
-### Windows
 
-windows配下にVisualStadioのソリューションファイルがあります。
-
-### linux
-
-linux配下にmakeファイルがあります。
+## Windows(Visual Studio)
 
 
-### emscripten
+
+### [libTbskModem](https://github.com/nyatla/TBSKmodemCpp/tree/master/windows/TBSKmodemCpp/libTbskModem)
+This is a project for a static library that is referenced by other projects.
+
+### [Modulation](https://github.com/nyatla/TBSKmodemCpp/tree/master/windows/TBSKmodemCpp/Modulation)
+Saves modulated signals to a WAV file.
+
+### [Demodulation](https://github.com/nyatla/TBSKmodemCpp/tree/master/windows/TBSKmodemCpp/Demodulation)
+Reads data from WAV files.
+
+### [PcmTest](https://github.com/nyatla/TBSKmodemCpp/tree/master/windows/TBSKmodemCpp/PcmTest)
+A test program for PCM file access.
+
+
+
+## GCC
+
+This is implemented in a GCC Makefile.
+There are libraries and test programs included.
+
+
+### [libtbskmodem.a](https://github.com/nyatla/TBSKmodemCpp/tree/master/linux/libtbskmodem)
+Generate the static library libtbskmodem.a.
+```
+cd libtbskmodem
+$make all
+```
+### [Modulation](https://github.com/nyatla/TBSKmodemCpp/tree/master/linux/Modulation)
+Generate a test program to modulate a bit sequence. Please generate libtbskmodem.a first.
+```
+cd Modulation
+$make all
+```
+
+
+## emscripten
+
+Here's a Makefile for emscripten.
+
+The JavaScript API to be published by emscripten is defined in [functions.cpp](https://github.com/nyatla/TBSKmodemCpp/blob/master/emscripten/tbskmodemjs/src/functions.cpp).
+
+
+### [libtbskmodem](https://github.com/nyatla/TBSKmodemCpp/tree/master/emscripten/libtbskmodem)
+Generate the static library libtbskmodem.a. This library is required to generate glue code.
+
+```
+cd libtbskmodem
+$make all
+```
+
+### [tbskmodemjs](https://github.com/nyatla/TBSKmodemCpp/tree/master/emscripten/tbskmodemjs)
+Generate glue code for wasm.
+
+Standard glue code set.
+```
+cd tbskmodemjs
+$make
+```
+
+
+Module glue code.
+```
+cd tbskmodemjs
+$make mod
+
+```
+
+The modularized glue code is used in TbskmodemJS.
 

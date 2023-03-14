@@ -18,16 +18,11 @@
                 console.log("pointers:"+tj.getPointerHolderSize());
                 let farray = mod.modulate("スーパーウルトラセクシーヒーローZAN");
                 console.log(farray.length);
-/*
+
                 console.log(tj);
                 for(let i = 0; i < 1000; i++){
                     farray.push(0);
                 }
-                let sum = 0;
-                for (let i = 0; i < farray.length; i++) {
-                    sum += farray[i];
-                }
-                console.log("srcsum:",sum);
                 let b = [];
                 for (let i = 0; i < 2; i++) {
                     for (let j = 0; j < farray.length; j++) {
@@ -37,18 +32,18 @@
                 farray = b;
 
                 console.log("demodulate");
-                let demod = new tj.TbskDemodulator(tone, preamble);
+                let demod = new tj.TbskDemodulator(tone,1.0,4);
                 let dint = demod.demodulate(farray, "utf8");
                 console.log(dint);
-*/
+
                 //listener test
                 console.log("listener");
                 let listener = new tj.TbskListener(tone,1,4, { onData: (d) => { console.log(d); } },"utf8");
                 console.log("#1");
-                listener.push(farray);
-                console.log("#2");
-//                listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
 //                listener.push(farray);
+                console.log("#2");
+                listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
+                listener.push(farray);
                 console.log("#2.5");
 //                listener.push(farray);
                 console.log("#3");
