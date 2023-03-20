@@ -17,7 +17,6 @@ namespace TBSKmodemCPP
     {
     }
 
-
     TbskDemodulator::TbskDemodulator(const shared_ptr<const TraitTone>& tone, const shared_ptr<Preamble>& preamble) :TbskDemodulator_impl(tone, preamble) {
     }
 
@@ -35,6 +34,7 @@ namespace TBSKmodemCPP
         bwf->SetInput(this->_inst->GetResult());
         return bwf;
     };
+
     void AsyncDemodulateAsInt::Close(){
         this->_inst->Close();
     };

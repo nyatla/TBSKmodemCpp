@@ -504,19 +504,19 @@ extern "C" {
 
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
-    extern  void TBSKmodem_api_load_();
-    void EMSCRIPTEN_KEEPALIVE load_apis() {
-        return TBSKmodem_api_load_();
-    }
-
-#ifdef __cplusplus
-}
-#endif
+//#ifdef __cplusplus
+//extern "C" {
+//#endif
+//
+//
+//    extern  void TBSKmodem_api_load_();
+//    void EMSCRIPTEN_KEEPALIVE load_apis() {
+//        return TBSKmodem_api_load_();
+//    }
+//
+//#ifdef __cplusplus
+//}
+//#endif
 
 /*
 void main()

@@ -14,6 +14,10 @@ namespace TBSKmodemCPP
         AsyncMethod()
         {
         }
+        virtual ~AsyncMethod()
+        {
+        }
+
         //""" 関数が完了するとtrueを返し、resultプロパティが利用可能になります。falseの間は再実行してください。
         //    Trueを返した場合は自動でcloseされます。
         //    closeがTrueを示すときは常にTrueを返します。

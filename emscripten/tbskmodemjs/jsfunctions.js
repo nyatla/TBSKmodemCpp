@@ -1,6 +1,6 @@
 
 
-function TBSKmodem_api_load_()
+function TbskModem_load_apis()
 {
     //Ç±Ç±Ç©ÇÁèâä˙âªÉRÅ[Éh
     let MOD = Module;
@@ -587,11 +587,6 @@ function TBSKmodem_api_load_()
     console.log("tbskmodem initialized.", this._instance);
     return this._instance;
 }
-
-
-mergeInto(LibraryManager.library, {
-    TBSKmodem_api_load_
-});
 
 
 

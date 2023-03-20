@@ -131,6 +131,9 @@ namespace TBSKmodemCPP
             //return this->_result;
         }
     public:
+        ~WaitForSymbolAS_impl(){
+            this->Close();
+        }
         void Close()override
         {
             if (!this->_closed)

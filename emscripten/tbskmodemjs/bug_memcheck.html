@@ -3,17 +3,20 @@
 <head>
 	<meta charset=utf-8>
 	<meta content="text/html; charset=utf-8" http-equiv=Content-Type>
+    <script></script>
 	<title>Hello WASM World!</title>
 </head>
 <body>
+    <script src="./jsfunctions.js"></script>
     <script>
         function act() {
+            let apis = TbskModem_load_apis();
             //  TBSK modem
             console.log("OK");
             let tbsk = Module.tbskmodem;
 
 
-            
+
             var tone = new tbsk.XPskSinTone(10, 10);
             tone.dispose();
             var tone2 = new tbsk.XPskSinTone(10, 10);
@@ -23,10 +26,9 @@
         }
         window.addEventListener('load', function () {
             Module.onRuntimeInitialized = function () {
-                Module._load_apis();
+                setTimeout(() => { act(); }, 1000);
             }
         });
-
     </script>
     <button class=mybutton onclick="act()">Run mulBy2</button><br>
     <script async src="tbskmodem_wasm.js"></script>

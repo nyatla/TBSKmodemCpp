@@ -6,78 +6,74 @@
   <title>Hello WASM World!</title>
 </head>
 <body>
+    <script src="./jsfunctions.js"></script>
     <button class=mybutton>Run mulBy2</button><br>
     <script>
-        window.addEventListener('load', function () {            
-            Module.onRuntimeInitialized = function () {
-                Module._load_apis();//Module.tbskmodemにクラスライブラリをロード
-                //  TBSK modem
-                let tj = Module.tbskmodem;
-                var tone = new tj.XPskSinTone(10,10);
-                let mod = new tj.TbskModulator(tone);
-                console.log("pointers:"+tj.getPointerHolderSize());
-                let farray = mod.modulate("スーパーウルトラセクシーヒーローZAN");
-                console.log(farray.length);
+        function act() {
+            TbskModem_load_apis();
+            //  TBSK modem
+            let tj = Module.tbskmodem;
+            var tone = new tj.XPskSinTone(10, 10);
+            let mod = new tj.TbskModulator(tone);
+            console.log("pointers:" + tj.getPointerHolderSize());
+            let farray = mod.modulate("スーパーウルトラセクシーヒーローZAN");
+            console.log(farray.length);
 
-                console.log(tj);
-                for(let i = 0; i < 1000; i++){
-                    farray.push(0);
-                }
-                let b = [];
-                for (let i = 0; i < 2; i++) {
-                    for (let j = 0; j < farray.length; j++) {
-                        b.push(farray[j]);
-                    }
-                }
-                farray = b;
-
-                console.log("demodulate");
-                let demod = new tj.TbskDemodulator(tone,1.0,4);
-                let dint = demod.demodulate(farray, "utf8");
-                console.log(dint);
-
-                //listener test
-                console.log("listener");
-                let listener = new tj.TbskListener(tone,1,4, { onData: (d) => { console.log(d); } },"utf8");
-                console.log("#1");
-//                listener.push(farray);
-                console.log("#2");
-                listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
-                listener.push(farray);
-                console.log("#2.5");
-//                listener.push(farray);
-                console.log("#3");
-                listener.push([]);
-                console.log()
-                let pcm = tj.PcmData.create(farray, 16, 8000);
-                console.log(pcm.dump());
-
-
-
-/*  再生系のテスト
-                var actx = new (window.AudioContext || window.webkitAudioContext)();
-
-                let mod = new Modulator();
-               let source=mod.modulate2BufferSource(actx,[0,1,2],8000);
-
-               // AudioBufferSourceNode にバッファーを設定する
-               source.connect(actx.destination);
-                // 音源の再生を始める
-              source.start();
-
-*/
+            console.log(tj);
+            for (let i = 0; i < 1000; i++) {
+                farray.push(0);
             }
+            let b = [];
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < farray.length; j++) {
+                    b.push(farray[j]);
+                }
+            }
+            farray = b;
+
+            console.log("demodulate");
+            let demod = new tj.TbskDemodulator(tone, 1.0, 4);
+            let dint = demod.demodulate(farray, "utf8");
+            console.log(dint);
+
+            //listener test
+            console.log("listener");
+            let listener = new tj.TbskListener(tone, 1, 4, { onData: (d) => { console.log(d); } }, "utf8");
+            console.log("#1");
+            //                listener.push(farray);
+            console.log("#2");
+            listener.push([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,]);
+            listener.push(farray);
+            console.log("#2.5");
+            //                listener.push(farray);
+            console.log("#3");
+            listener.push([]);
+            console.log()
+            let pcm = tj.PcmData.create(farray, 16, 8000);
+            console.log(pcm.dump());
 
 
 
+            /*  再生系のテスト
+                            var actx = new (window.AudioContext || window.webkitAudioContext)();
 
+                            let mod = new Modulator();
+                           let source=mod.modulate2BufferSource(actx,[0,1,2],8000);
 
+                           // AudioBufferSourceNode にバッファーを設定する
+                           source.connect(actx.destination);
+                            // 音源の再生を始める
+                          source.start();
 
+            */
 
-
-		
-		});  
-  </script>
-  <script async src="tbskmodem_wasm.js"></script>
+        }
+        window.addEventListener('load', function () {
+            Module.onRuntimeInitialized = function () {
+                setTimeout(() => { act(); }, 1000);
+            }
+        });
+    </script>
+    <script async src="tbskmodem_wasm.js"></script>
 </body>
 </html>

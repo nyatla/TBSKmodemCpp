@@ -9,5 +9,5 @@ namespace TBSKmodemCPP
 {
 	const int VERSION_MAJOR = 0;
 	const int VERSION_MINER = 3;
-	const int VERSION_PATCH = 8;
+	const int VERSION_PATCH = 9;
 }
