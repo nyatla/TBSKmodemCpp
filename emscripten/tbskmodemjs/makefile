@@ -53,6 +53,7 @@ $(PATH_OUTPUT)/$(NAME_MOD):$(TARGET_FILES)
 	-s AUTO_NATIVE_LIBRARIES=0 \
 	-s ENVIRONMENT=web \
 	-s MODULARIZE=1 \
+	-s EXPORT_ES6=1 \
 	-O2 -o $(PATH_OUTPUT)/$(NAME_MOD)  $(FLGS) $(TARGETS) ../libtbskmodem/libtbskmodem.a
 
 

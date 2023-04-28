@@ -213,10 +213,7 @@ extern "C" {
         (*ptr)->Put(v);
     }
 
-    //EXTERN_C shared_ptr<OutputIterator<int>>* new_IntOutputIterator(const shared_ptr<IPyIterator<int>>& src) {
-    //    auto r = std::make_shared<OutputIterator<int>>(src);
-    //    return (shared_ptr<OutputIterator<int>>*)_instances.Add(r);
-    //}
+
     EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_IntOutputIterator_hasNext(const shared_ptr<OutputIterator<int>>* ptr)
     {
         return (*ptr)->hasNext();
@@ -226,10 +223,7 @@ extern "C" {
         return (*ptr)->lastNext();
     }
 
-    //EXTERN_C shared_ptr<OutputIterator<double>>* new_DoubleOutputIterator(const shared_ptr<IPyIterator<double>>& src) {
-    //    auto r = std::make_shared<OutputIterator<double>>(src);
-    //    return (shared_ptr<OutputIterator<double>>*)_instances.Add(r);
-    //}
+
     EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_tbskmodem_DoubleOutputIterator_hasNext(const shared_ptr<OutputIterator<double>>* ptr)
     {
         return (*ptr)->hasNext();
@@ -500,7 +494,14 @@ extern "C" {
     
 
 
-
+EXTERN_C int EMSCRIPTEN_KEEPALIVE wasm_test_double(double v)
+{
+    if (v > 1 || v < -1) {
+        EM_ASM(console.log('Range err:' + $0);, v);
+        return -1;
+    }
+    return 0;
+}
 
 
 
